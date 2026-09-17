@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "app.roadto42.health"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "app.roadto42.health"
@@ -27,5 +27,6 @@ dependencies {
     implementation("androidx.health.connect:connect-client:1.1.0")
     implementation(platform("io.github.jan-tennert.supabase:bom:3.2.5"))
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
     implementation("io.ktor:ktor-client-android:3.1.3")
 }

@@ -18,7 +18,13 @@ android {
         buildConfigField("String", "SUPABASE_KEY", "\"sb_publishable_RIt2HNAqPRO6vXMqWQEG3A_NJUHCj_t\"")
     }
     buildFeatures { buildConfig = true }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }
+
+kotlin { jvmToolchain(17) }
 
 dependencies {
     implementation("androidx.core:core-ktx:1.15.0")

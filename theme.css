@@ -15,4 +15,6 @@ body{overflow-x:hidden;overflow-y:auto;min-height:100%;height:auto;-webkit-overf
 .app{min-height:100svh;height:auto;overflow:visible}
 main{height:auto;min-height:0;overflow:visible}
 .page{height:auto;min-height:0;overflow:visible}
+#main{display:block;overflow:visible!important}
+html,body{overflow:visible!important;overflow-x:hidden!important;overflow-y:auto!important}
 .readinessCard{border-color:#78d59c66;background:linear-gradient(135deg,#173d3f,#0a1929)}

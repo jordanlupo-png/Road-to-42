@@ -1,1 +1,318 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07172b"><title>Road to 42</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>:root{--n:#07172b;--g:#178653;--r:#c9363e;--gold:#e9a443;--cream:#f8f1e5;--paper:#fffaf2;--muted:#77736e;--line:#e5d9c8}*{box-sizing:border-box}body{margin:0;background:#111;color:var(--n);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.app{max-width:520px;margin:auto;min-height:100svh;background:var(--cream)}button,input,select{font:inherit}.hidden{display:none!important}.hero{height:43svh;min-height:350px;background:url('file_000000004de481f4b3cc5926132b5ce3.jpg?v=34') center 42%/cover no-repeat;position:relative}.hero:after{content:"";position:absolute;inset:60% 0 0;background:linear-gradient(transparent,var(--cream))}.setup{padding:0 20px 35px;margin-top:-20px;position:relative}.kicker,small{font-size:9px;letter-spacing:1.3px;font-weight:900}.kicker{color:var(--g)}h1{font-size:34px;line-height:1;margin:6px 0 10px}.sub{color:var(--muted);font-size:13px}.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px;margin:10px 0;box-shadow:0 8px 24px #5a37100b}.field{display:block;font-size:9px;font-weight:900;color:var(--muted);margin:9px 0}.field input,.field select{display:block;width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;padding:9px 2px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.cta{width:100%;border:0;border-radius:14px;background:var(--n);color:#fff;padding:15px;font-weight:900;margin-top:10px}.google{background:#fff;color:#222;border:1px solid #ddd}.top{padding:18px 17px 10px;display:flex;align-items:center;justify-content:space-between}.top h2{margin:2px 0}.pill{border:1px solid var(--line);background:var(--paper);border-radius:20px;padding:9px 12px;font-weight:800}.page{display:none;padding:0 15px 100px}.page.active{display:block}.dashhero{height:190px;border-radius:23px;background:url('file_000000004de481f4b3cc5926132b5ce3.jpg?v=34') center 70%/cover no-repeat;position:relative;overflow:hidden}.dashhero:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,#07172bea)}.heroText{position:absolute;z-index:2;bottom:17px;left:17px;color:#fff}.heroText b{display:block;font-size:24px}.stats{display:grid;grid-template-columns:repeat(3,1fr);background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:11px 0}.stats div{text-align:center;padding:13px 2px;border-right:1px solid var(--line)}.stats b{display:block;font-size:19px}.stats span{font-size:8px;color:var(--muted);font-weight:900}.xpCard{background:linear-gradient(135deg,var(--n),#173a5c);color:#fff}.xpTop{display:flex;justify-content:space-between;align-items:end}.xpBig{font-size:30px;font-weight:900;color:var(--gold)}.bar{height:10px;background:#ded8ce;border-radius:10px;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--g),var(--gold))}.xpCard .bar{background:#ffffff25}.xpCard .bar i{background:var(--gold)}.power{font-size:34px;font-weight:900}.gates{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.gate{background:#f5eee4;border:1px solid var(--line);border-radius:12px;padding:10px}.gate span{display:block;font-size:8px;color:var(--muted)}.title{text-align:center;margin:12px 0 18px}.title h2{font-size:28px;margin:4px}.logtype{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.logtype button{border:1px solid var(--line);background:var(--paper);border-radius:11px;padding:10px 4px;font-size:10px;font-weight:800}.logtype button.on{background:var(--n);color:#fff}.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.scale input{display:none}.scale label{display:grid;place-items:center;height:40px;border:1px solid var(--line);border-radius:11px}.scale input:checked+label{background:var(--n);color:#fff}.notice{background:#fff2d9;border:1px solid #efd49e;border-radius:13px;padding:12px;font-size:11px;margin-top:9px}.activity,.rank,.account{display:flex;align-items:center;gap:10px}.activityMain,.rankBody{flex:1}.delete{border:0;background:#f9e4e4;color:#9e2229;border-radius:10px;padding:9px;font-weight:900}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:#07172bf7;padding:8px 2px calc(8px + env(safe-area-inset-bottom));z-index:5}.nav button{border:0;background:transparent;color:#9ca8b5;font-size:18px}.nav button.active{color:var(--gold)}.nav span{display:block;font-size:8px}.rankNo{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--n);color:var(--gold);font-weight:900}.rankScore{text-align:right}.rankScore b{display:block;font-size:20px}.avatar{width:44px;height:44px;border-radius:50%}.menu button{width:100%;border:0;border-bottom:1px solid var(--line);background:none;padding:15px 2px;text-align:left;font-weight:800}.cloud{color:var(--g);font-size:10px;font-weight:900}.characterIntro{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:9px}.characterIntro h3{margin:0}.characterGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.characterChoice{appearance:none;border:2px solid transparent;background:#f1e9dc;border-radius:13px;padding:5px 3px 7px;color:var(--n);font-size:9px;font-weight:900;cursor:pointer;min-width:0}.characterChoice img{display:block;width:100%;aspect-ratio:1;object-fit:contain}.characterChoice.selected{border-color:var(--gold);background:#fff6e7;box-shadow:0 0 0 2px #e9a44322}.characterChoice:focus-visible{outline:3px solid #17865355;outline-offset:2px}.dashhero .heroAvatar{position:absolute;z-index:2;width:58%;height:92%;right:-2%;bottom:-2%;object-fit:contain;object-position:right bottom;filter:drop-shadow(0 12px 12px #0006);pointer-events:none}.heroText{max-width:48%}.evolutionTag{display:inline-block;margin-top:5px;padding:4px 7px;border-radius:20px;background:#07172bcc;color:var(--gold);font-size:8px;font-weight:900;letter-spacing:.7px}.avatar{width:78px;height:78px;border-radius:16px;object-fit:contain;background:#f1e9dc}.rankAvatar{width:54px;height:54px;object-fit:contain;flex:none}.pickerStatus{min-height:16px;margin:8px 0 0;color:var(--g);font-size:10px;font-weight:800}@media(max-width:360px){.characterGrid{grid-template-columns:repeat(4,1fr);gap:4px}.characterChoice{font-size:8px}.dashhero .heroAvatar{width:55%}}</style></head><body><div class="app"><section id="auth"><div class="hero"></div><div class="setup"><div class="kicker">RUN · IMPROVE · BELONG</div><h1>Your road starts here.</h1><p class="sub">Train. Level up. Challenge your people.</p><div class="card"><button id="googleLogin" class="cta google">G &nbsp; CONTINUE WITH GOOGLE</button></div><div id="authMsg" class="notice hidden"></div></div></section><section id="profile" class="hidden"><div class="hero"></div><div class="setup"><div class="kicker">WELCOME TO ROAD TO 42</div><h1>Create your runner.</h1><div class="card"><div class="characterIntro"><div><small>CHOOSE YOUR RUNNER</small><h3 id="profileCharacterName">Wolf</h3></div><span class="sub">Evolves as you level up</span></div><div id="profileCharacters" class="characterGrid"></div><label class="field">YOUR NAME<input id="newName"></label><div class="grid"><label class="field">CURRENT WEEKLY KM<input id="baseKm" type="number" value="20"></label><label class="field">RUNS PER WEEK<input id="baseRuns" type="number" value="3"></label></div><div class="grid"><label class="field">GOAL<select id="goal"><option>Marathon</option><option>Half Marathon</option><option>10K</option><option>5K</option></select></label><label class="field">RACE DATE<input id="raceDate" type="date" value="2027-03-14"></label></div><button id="join" class="cta">CREATE MY CLOUD PROFILE →</button></div></div></section><section id="main" class="hidden"><header class="top"><div><small>ROAD TO 42 · <span class="cloud">☁ CLOUD</span></small><h2 id="who"></h2></div><button class="pill" data-go="more">Profile</button></header><main><section id="home" class="page active"><div class="dashhero"><img id="heroAvatar" class="heroAvatar" alt=""><div class="heroText"><small>YOUR ROAD TO</small><b id="event"></b><span id="days"></span><div id="evolutionTag" class="evolutionTag"></div></div></div><div class="stats"><div><b id="total">0</b><span>TOTAL XP</span></div><div><b id="week">0</b><span>KM THIS WEEK</span></div><div><b id="runsCount">0</b><span>RUNS</span></div></div><div class="card xpCard"><div class="xpTop"><div><small>LEVEL PROGRESS</small><h3 id="level"></h3></div><div class="xpBig"><span id="xpNow">0</span> XP</div></div><div class="bar"><i id="xpbar"></i></div><p id="xpText"></p></div><div class="card"><div style="display:flex;justify-content:space-between"><div><b>Runner Power</b><p class="sub">Balanced development</p></div><div class="power"><span id="power">0</span><small>/100</small></div></div><div class="bar"><i id="powerbar"></i></div><div class="gates"><div class="gate"><b id="gXP"></b><span>XP · DISTANCE</span></div><div class="gate"><b id="gEnd"></b><span>ENDURANCE</span></div><div class="gate"><b id="gSpeed"></b><span>QUALITY PACE</span></div><div class="gate"><b id="gCons"></b><span>CONSISTENCY</span></div></div></div><div class="card"><b>TODAY</b><p class="sub">Log training to update your cloud progress.</p><button class="cta" data-go="checkin">CHECK IN TODAY →</button></div></section><section id="training" class="page"><div class="title"><small>TRAINING LOG</small><h2>Your activity</h2><p class="sub">Saved in Supabase cloud.</p></div><div id="recent"></div></section><section id="checkin" class="page"><div class="title"><small>DAILY INPUT</small><h2>How are you today?</h2></div><div class="card"><h3>🏃 Activity</h3><div class="logtype" id="types"><button class="on" data-type="Rest">Rest</button><button data-type="Easy">Easy run</button><button data-type="Quality">Quality</button><button data-type="Long">Long run</button><button data-type="Strength">Strength</button><button data-type="Cross">Cross-train</button></div><div class="grid"><label class="field">DISTANCE KM<input id="km" type="number" step=".1" value="0"></label><label class="field">MINUTES<input id="mins" type="number" value="0"></label></div><label class="field">PACE (OPTIONAL)<input id="pace" placeholder="6:30"></label></div><div class="card"><h3>😴 Sleep</h3><div class="scale" data-scale="sleep"></div><label class="field">SLEEP HOURS<input id="hours" type="number" step=".1" value="7"></label></div><div class="card"><h3>🔋 Energy</h3><div class="scale" data-scale="energy"></div></div><div class="card"><h3>🦵 Soreness</h3><div class="scale" data-scale="soreness"></div></div><button id="saveDay" class="cta">SAVE TO CLOUD</button><div id="saved" class="notice hidden"></div></section><section id="compete" class="page"><div class="title"><small>ROAD TO 42 COMMUNITY</small><h2>Competition</h2><p class="sub">Runners ranked by balanced Runner Power.</p></div><div id="leaderboard"></div></section><section id="more" class="page"><div class="title"><small>ROAD TO 42</small><h2>Account</h2></div><div class="card account"><img id="avatar" class="avatar" alt=""><div><b id="accountName"></b><div id="accountEmail" class="sub"></div><div class="cloud">☁ Supabase connected</div></div></div><div class="card"><div class="characterIntro"><div><small>YOUR RUNNER</small><h3 id="accountCharacterName">Wolf</h3></div><span class="sub">Tap to switch</span></div><div id="accountCharacters" class="characterGrid"></div><div id="avatarStatus" class="pickerStatus" aria-live="polite"></div></div><div class="card menu"><button id="logout">↪ Log out</button></div></section></main><nav class="nav"><button class="active" data-go="home">⌂<span>Home</span></button><button data-go="training">◇<span>Training</span></button><button data-go="checkin">＋<span>Check-in</span></button><button data-go="compete">♜<span>Compete</span></button><button data-go="more">•••<span>More</span></button></nav></section></div><script>(function(){'use strict';const URL='https://negkvlgimrthgonyvdqf.supabase.co',KEY='sb_publishable_RIt2HNAqPRO6vXMqWQEG3A_NJUHCj_t',sb=window.supabase.createClient(URL,KEY),e=id=>document.getElementById(id);let user=null,S=null,type='Rest',character='wolf';const levels=[['Rookie',25],['Runner',60],['Road Runner',120],['Distance Runner',200],['Challenger',300],['Half Marathoner',425],['Endurance Runner',575],['Marathon Contender',750],['Marathon Ready',950],['Marathoner',1200]],characters=[['wolf','Wolf'],['fox','Fox'],['bear','Bear'],['lynx','Lynx'],['rabbit','Rabbit'],['raccoon','Raccoon'],['dog','Dog'],['cat','Cat']],evolutionNames=['The Beginning','Building Habits','Getting Stronger','Peak Form','Champion'];function validCharacter(key){return characters.some(c=>c[0]===key)?key:'wolf'}function levelIndex(xp){let li=0;while(li<9&&xp>=levels[li][1])li++;return li}function evolutionIndex(level){return Math.min(4,Math.floor((level-1)/2))}function avatarPath(key,level){key=validCharacter(key);let stage=['01','05','10','15','20'][evolutionIndex(level)];return 'assets/avatars/'+key+'/'+key+'_'+stage+'.webp'}function characterName(key){let c=characters.find(x=>x[0]===key);return c?c[1]:'Wolf'}function drawPicker(id,selected,onChoose){let box=e(id);if(!box)return;box.innerHTML=characters.map(c=>'<button type="button" class="characterChoice '+(c[0]===selected?'selected':'')+'" data-character="'+c[0]+'" aria-pressed="'+(c[0]===selected)+'"><img src="'+avatarPath(c[0],1)+'" alt=""><span>'+c[1]+'</span></button>').join('');box.querySelectorAll('[data-character]').forEach(btn=>btn.onclick=()=>onChoose(btn.dataset.character))}function drawProfilePicker(){drawPicker('profileCharacters',character,key=>{character=key;e('profileCharacterName').textContent=characterName(key);drawProfilePicker()})}function hideAll(){['auth','profile','main'].forEach(x=>e(x).classList.add('hidden'))}function go(id){document.querySelectorAll('.page,.nav button').forEach(x=>x.classList.remove('active'));e(id).classList.add('active');document.querySelectorAll('[data-go="'+id+'"]').forEach(x=>x.classList.add('active'));if(id==='compete')renderCompetition();scrollTo(0,0)}function paceSec(p){if(!p)return 0;if(typeof p==='number')return p;let a=String(p).split(':');return a.length>1?(+a[0]*60)+(+a[1]||0):0}function fmtP(s){return s?Math.floor(s/60)+':'+String(Math.round(s%60)).padStart(2,'0')+'/km':'—'}function metrics(logs){let runs=logs.filter(l=>['Easy','Quality','Long'].includes(l.type)&&l.km>0),longest=Math.max(0,...runs.map(l=>l.km)),q=runs.filter(l=>l.type==='Quality'&&l.paceSec),best=q.length?Math.min(...q.map(l=>l.paceSec)):0,cut=Date.now()-28*86400000,days=new Set(logs.filter(l=>new Date(l.date).getTime()>=cut).map(l=>l.date.slice(0,10))).size,xp=logs.reduce((a,l)=>a+l.km,0),power=Math.round(Math.min(25,xp/100*25)+Math.min(25,longest/20*25)+(best?Math.max(5,Math.min(25,(480-best)/120*25)):0)+Math.min(25,days/12*25));return{xp,longest,best,days,power,runs:runs.length}}function mapActivity(a){return{id:a.id,date:a.activity_date+'T12:00:00',type:a.activity_type,km:+a.distance_km||0,mins:+a.duration_minutes||0,paceSec:+a.pace_seconds_per_km||0}}async function loadCloud(){let {data:p,error:pe}=await sb.from('profiles').select('*').eq('id',user.id).maybeSingle();if(pe)throw pe;if(!p)return null;let {data:a,error:ae}=await sb.from('activities').select('*').eq('user_id',user.id).order('activity_date',{ascending:true}).order('id',{ascending:true});if(ae)throw ae;return{name:p.display_name,base:+p.weekly_km_target||0,runs:+p.runs_per_week||0,goal:p.goal||'Marathon',date:p.race_date||'2027-03-14',character:validCharacter(p.character_key),logs:(a||[]).map(mapActivity)}}async function start(){let name=e('newName').value.trim();if(!name)return alert('Enter your name first.');let row={id:user.id,display_name:name,avatar_url:user.user_metadata?.avatar_url||null,weekly_km_target:+e('baseKm').value||20,runs_per_week:+e('baseRuns').value||3,goal:e('goal').value,race_date:e('raceDate').value,character_key:validCharacter(character),is_public:true};let {error}=await sb.from('profiles').upsert(row);if(error)return alert('Could not create profile: '+error.message);S=await loadCloud();showMain()}function showMain(){hideAll();e('main').classList.remove('hidden');render();go('home')}function render(){let M=metrics(S.logs),xp=M.xp,li=levelIndex(xp),level=li+1,prev=li?levels[li-1][1]:0,next=levels[li][1],pct=Math.min(100,Math.max(0,(xp-prev)/(next-prev)*100)),runner=validCharacter(S.character),stage=evolutionIndex(level);e('who').textContent=S.name;e('event').textContent=S.goal.toUpperCase();e('total').textContent=xp.toFixed(1);let now=new Date(),mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));mon.setHours(0,0,0,0);e('week').textContent=S.logs.filter(l=>new Date(l.date)>=mon).reduce((a,l)=>a+l.km,0).toFixed(1);e('runsCount').textContent=M.runs;e('level').textContent='Level '+level+' · '+levels[li][0];e('xpNow').textContent=xp.toFixed(1);e('xpbar').style.width=pct+'%';e('xpText').textContent=Math.max(0,next-xp).toFixed(1)+' XP to next level · 1 km = 1 XP';e('power').textContent=M.power;e('powerbar').style.width=M.power+'%';e('gXP').textContent=M.xp.toFixed(0)+' XP';e('gEnd').textContent=M.longest.toFixed(1)+' km';e('gSpeed').textContent=fmtP(M.best);e('gCons').textContent=M.days+'/12';let target=new Date(S.date+'T12:00:00');e('days').textContent=Math.max(0,Math.ceil((target-new Date())/86400000))+' days to go';let heroSrc=avatarPath(runner,level);e('heroAvatar').src=heroSrc;e('heroAvatar').alt=characterName(runner)+' runner at '+evolutionNames[stage];e('evolutionTag').textContent=characterName(runner).toUpperCase()+' · '+evolutionNames[stage].toUpperCase();let recent=S.logs.slice().reverse();e('recent').innerHTML=recent.length?recent.map(l=>'<div class="card activity"><div class="activityMain"><b>'+l.type+'</b> · '+l.km.toFixed(1)+' km<br><span class="sub">'+new Date(l.date).toLocaleDateString()+(l.paceSec?' · '+fmtP(l.paceSec):'')+'</span></div><button class="delete" data-del="'+l.id+'">DELETE</button></div>').join(''):'<div class="card sub">No cloud activities yet.</div>';document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>deleteLog(+b.dataset.del));e('accountName').textContent=S.name;e('accountEmail').textContent=user.email||'';e('avatar').src=heroSrc;e('avatar').alt=characterName(runner)+' runner';e('accountCharacterName').textContent=characterName(runner);drawPicker('accountCharacters',runner,saveCharacter)}async function saveCharacter(key){key=validCharacter(key);if(key===S.character)return;let status=e('avatarStatus');status.textContent='Saving '+characterName(key)+'…';let {error}=await sb.from('profiles').update({character_key:key}).eq('id',user.id);if(error){status.textContent='Could not save: '+error.message;return}S.character=key;character=key;render();e('avatarStatus').textContent=characterName(key)+' selected ✓'}async function deleteLog(id){if(!confirm('Delete this activity from the cloud?'))return;let {error}=await sb.from('activities').delete().eq('id',id).eq('user_id',user.id);if(error)return alert(error.message);S=await loadCloud();render()}function val(n){let q=document.querySelector('input[name="'+n+'"]:checked');return q?+q.value:3}async function saveDay(){let btn=e('saveDay');btn.disabled=true;btn.textContent='SAVING…';try{let km=+e('km').value||0,mins=+e('mins').value||0,p=paceSec(e('pace').value.trim()),today=new Date().toISOString().slice(0,10);let {error:aerr}=await sb.from('activities').insert({user_id:user.id,activity_date:today,activity_type:type,distance_km:km,duration_minutes:mins,pace_seconds_per_km:p||null});if(aerr)throw aerr;let {error:cerr}=await sb.from('daily_checkins').upsert({user_id:user.id,checkin_date:today,sleep_hours:+e('hours').value||null,energy:val('energy'),soreness:val('soreness'),mood:val('sleep')},{onConflict:'user_id,checkin_date'});if(cerr)throw cerr;S=await loadCloud();render();e('saved').classList.remove('hidden');e('saved').textContent='Saved to Supabase cloud ✓';e('km').value=0;e('mins').value=0;e('pace').value=''}catch(err){alert('Cloud save failed: '+err.message)}finally{btn.disabled=false;btn.textContent='SAVE TO CLOUD'}}async function renderCompetition(){e('leaderboard').innerHTML='<div class="card">Loading runners…</div>';let {data:p,error:pe}=await sb.from('profiles').select('id,display_name,character_key').eq('is_public',true);if(pe)return e('leaderboard').innerHTML='<div class="card">'+pe.message+'</div>';let {data:a,error:ae}=await sb.from('activities').select('id,user_id,activity_date,activity_type,distance_km,duration_minutes,pace_seconds_per_km');if(ae)return e('leaderboard').innerHTML='<div class="card">'+ae.message+'</div>';let arr=(p||[]).map(r=>{let logs=(a||[]).filter(x=>x.user_id===r.id).map(mapActivity),M=metrics(logs);return{id:r.id,name:r.display_name,character:validCharacter(r.character_key),M,level:levelIndex(M.xp)+1}}).sort((x,y)=>y.M.power-x.M.power||y.M.xp-x.M.xp);e('leaderboard').innerHTML=arr.map((x,i)=>'<div class="card rank"><div class="rankNo">'+(i+1)+'</div><img class="rankAvatar" src="'+avatarPath(x.character,x.level)+'" alt=""><div class="rankBody"><h3 style="margin:0">'+x.name+(x.id===user.id?' · YOU':'')+'</h3><span class="sub">'+characterName(x.character)+' · Level '+x.level+' · '+x.M.xp.toFixed(1)+' XP</span></div><div class="rankScore"><b>'+x.M.power+'</b><small>POWER</small></div></div>').join('')||'<div class="card">No runners yet.</div>'}async function login(){let {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://jordanlupo-png.github.io/Road-to-42/'}});if(error)alert(error.message)}async function logout(){await sb.auth.signOut();user=null;S=null;hideAll();e('auth').classList.remove('hidden')}async function boot(){try{let {data}=await sb.auth.getSession();user=data.session?.user||null;if(!user){hideAll();e('auth').classList.remove('hidden');return}S=await loadCloud();if(!S){hideAll();e('profile').classList.remove('hidden');let m=user.user_metadata||{};e('newName').value=(m.full_name||m.name||'').split(' ')[0];drawProfilePicker()}else{character=S.character;showMain()}}catch(err){hideAll();e('auth').classList.remove('hidden');e('authMsg').classList.remove('hidden');e('authMsg').textContent='Cloud error: '+err.message}}document.querySelectorAll('[data-scale]').forEach(box=>{let n=box.dataset.scale;for(let i=1;i<=5;i++)box.innerHTML+='<input type="radio" name="'+n+'" id="'+n+i+'" value="'+i+'" '+(i===3?'checked':'')+'><label for="'+n+i+'">'+i+'</label>'});document.querySelectorAll('#types button').forEach(b=>b.onclick=function(){document.querySelectorAll('#types button').forEach(z=>z.classList.remove('on'));this.classList.add('on');type=this.dataset.type});document.querySelectorAll('[data-go]').forEach(b=>b.onclick=function(){go(this.dataset.go)});e('googleLogin').onclick=login;e('join').onclick=start;e('saveDay').onclick=saveDay;e('logout').onclick=logout;drawProfilePicker();sb.auth.onAuthStateChange((event,session)=>{if(session&&(!user||user.id!==session.user.id)){user=session.user;setTimeout(boot,0)}});boot()})();</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07172b">
+<title>Road to 42</title>
+<meta name="description" content="Your running adventure. Log training, evolve your runner and grow together.">
+<link rel="manifest" href="manifest.json?v=36">
+<link rel="icon" type="image/png" href="assets/brand/icon-192.png?v=36">
+<link rel="apple-touch-icon" href="assets/brand/icon-192.png?v=36">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
+<link rel="stylesheet" href="theme.css?v=36">
+</head>
+<body>
+<div class="app">
+<section id="auth">
+<div class="hero" role="img" aria-label="Road to 42 animal runners on a trail above Rome">
+</div>
+<div class="setup">
+<div class="authBrand">
+<img src="assets/brand/icon-192.png" alt="" width="48" height="48">
+<div class="kicker">RUN · LEVEL UP · BELONG</div>
+</div>
+<h1>Your road starts here.</h1>
+<p class="sub">Train. Level up. Challenge your people.</p>
+<div class="card">
+<button id="googleLogin" class="cta google">
+<svg aria-hidden="true" viewBox="0 0 48 48" width="22" height="22">
+<path fill="#4285F4" d="M43.6 24.5c0-1.5-.1-2.9-.4-4.3H24v8.1h11c-.5 2.6-1.9 4.8-4.1 6.3v5.2h6.7c3.9-3.6 6-8.9 6-15.3z"/>
+<path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.7-5.2c-1.8 1.2-4.1 1.9-6.8 1.9-5.3 0-9.8-3.6-11.4-8.4H5.7v5.4C9 39.5 16 44 24 44z"/>
+<path fill="#FBBC05" d="M12.6 27.4a12 12 0 0 1 0-6.8v-5.4H5.7a20 20 0 0 0 0 17.6z"/>
+<path fill="#EA4335" d="M24 12.2c3 0 5.7 1 7.8 3.1l5.9-5.9C34.1 6.1 29.5 4 24 4 16 4 9 8.5 5.7 15.2l6.9 5.4c1.6-4.8 6.1-8.4 11.4-8.4z"/>
+</svg>
+<span>Sign in with Google</span>
+</button>
+</div>
+<p class="authHint">One Google account. Your runner, your progress, everywhere.</p>
+<div id="authMsg" class="notice hidden" role="status">
+</div>
+</div>
+</section>
+<section id="profile" class="hidden">
+<div class="hero" role="img" aria-label="Road to 42 animal runners on a trail above Rome">
+</div>
+<div class="setup">
+<div class="kicker">WELCOME TO ROAD TO 42</div>
+<h1>Create your runner.</h1>
+<form id="profileForm" class="card">
+<div class="characterIntro">
+<div>
+<small>CHOOSE YOUR RUNNER</small>
+<h3 id="profileCharacterName">Wolf</h3>
+</div>
+<span class="sub">Evolves as you level up</span>
+</div>
+<div id="profileCharacters" class="characterGrid">
+</div>
+<label class="field">YOUR NAME<input id="newName" required maxlength="50" autocomplete="given-name">
+</label>
+<div class="grid">
+<label class="field">CURRENT WEEKLY KM<input id="baseKm" min="0" max="500" step="0.1" required type="number" value="20">
+</label>
+<label class="field">RUNS PER WEEK<input id="baseRuns" min="1" max="21" required type="number" value="3">
+</label>
+</div>
+<div class="grid">
+<label class="field">GOAL<select id="goal">
+<option>Marathon</option>
+<option>Half Marathon</option>
+<option>10K</option>
+<option>5K</option>
+</select>
+</label>
+<label class="field">RACE DATE<input id="raceDate" required type="date" value="2027-03-14">
+</label>
+</div>
+<p class="sub">Your runner name and training progress appear on the community leaderboard. Your email stays private.</p>
+<button id="join" type="submit" class="cta">Start my journey</button>
+<div id="profileMsg" class="notice hidden" role="status">
+</div>
+</form>
+</div>
+</section>
+<section id="main" class="hidden">
+<header class="top">
+<img class="brandIcon" src="assets/brand/icon-192.png" alt="Road to 42">
+<div>
+<small>ROAD TO 42 · <span class="cloud">Connected</span>
+</small>
+<h2 id="who">
+</h2>
+</div>
+<button class="pill" data-go="more">Profile</button>
+</header>
+<main>
+<section id="home" class="page active">
+<div class="homeCover" role="img" aria-label="Road to 42: animal runners exploring Rome">
+</div>
+<div class="quickActions">
+<button data-go="checkin">
+<span><svg class="uiIcon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span>Log a run</button>
+<button data-go="training">
+<span><svg class="uiIcon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10m8 10V4m8 16V7"/></svg></span>Activity</button>
+<button data-go="compete">
+<span><svg class="uiIcon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8v7a4 4 0 0 1-8 0zM8 5H4v3a4 4 0 0 0 4 4m8-7h4v3a4 4 0 0 1-4 4m-4 2v6m-4 0h8"/></svg></span>Compete</button>
+</div>
+<div class="dashhero">
+<img id="heroAvatar" class="heroAvatar" alt="">
+<div class="heroText">
+<small>YOUR ROAD TO</small>
+<b id="event">
+</b>
+<span id="days">
+</span>
+<div id="evolutionTag" class="evolutionTag">
+</div>
+</div>
+</div>
+<div class="stats">
+<div>
+<b id="total">0</b>
+<span>TOTAL XP</span>
+</div>
+<div>
+<b id="week">0</b>
+<span>KM THIS WEEK</span>
+</div>
+<div>
+<b id="runsCount">0</b>
+<span>RUNS</span>
+</div>
+</div>
+<div class="card xpCard">
+<div class="xpTop">
+<div>
+<small>LEVEL PROGRESS</small>
+<h3 id="level">
+</h3>
+</div>
+<div class="xpBig">
+<span id="xpNow">0</span> XP</div>
+</div>
+<div class="bar">
+<i id="xpbar">
+</i>
+</div>
+<p id="xpText">
+</p>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between">
+<div>
+<b>Runner Power</b>
+<p class="sub">Balanced development</p>
+</div>
+<div class="power">
+<span id="power">0</span>
+<small>/100</small>
+</div>
+</div>
+<div class="bar">
+<i id="powerbar">
+</i>
+</div>
+<div class="gates">
+<div class="gate">
+<b id="gXP">
+</b>
+<span>XP · DISTANCE</span>
+</div>
+<div class="gate">
+<b id="gEnd">
+</b>
+<span>ENDURANCE</span>
+</div>
+<div class="gate">
+<b id="gSpeed">
+</b>
+<span>QUALITY PACE</span>
+</div>
+<div class="gate">
+<b id="gCons">
+</b>
+<span>CONSISTENCY</span>
+</div>
+</div>
+</div>
+<div class="card">
+<b>TODAY</b>
+<p class="sub">Build your journey, one day at a time.</p>
+<button class="cta" data-go="checkin">Log today’s activity</button>
+</div>
+</section>
+<section id="training" class="page">
+<div class="title">
+<small>TRAINING LOG</small>
+<h2>Your activity</h2>
+<p class="sub">Every step is part of your story.</p>
+</div>
+<div id="recent">
+</div>
+</section>
+<section id="checkin" class="page">
+<div class="title">
+<small>DAILY INPUT</small>
+<h2>How are you today?</h2>
+</div>
+<form id="checkinForm">
+<div class="card">
+<h3>Activity</h3>
+<div class="logtype" id="types">
+<button type="button" class="on" data-type="Rest">Rest</button>
+<button type="button" data-type="Easy">Easy run</button>
+<button type="button" data-type="Quality">Quality</button>
+<button type="button" data-type="Long">Long run</button>
+<button type="button" data-type="Strength">Strength</button>
+<button type="button" data-type="Cross">Cross-train</button>
+</div>
+<div class="grid">
+<label class="field">DISTANCE KM<input id="km" type="number" min="0" max="500" step=".1" required value="0">
+</label>
+<label class="field">MINUTES<input id="mins" type="number" min="0" max="10080" step="0.1" required value="0">
+</label>
+</div>
+<label class="field">PACE (OPTIONAL)<input id="pace" placeholder="6:30" inputmode="decimal" pattern="[0-9]{1,2}:[0-5][0-9]" title="Minutes and seconds, for example 6:30">
+</label>
+</div>
+<div class="card">
+<h3>Sleep quality</h3>
+<p class="sub scaleHint">1 · Poor <span>5 · Restful</span>
+</p>
+<div class="scale" role="radiogroup" aria-label="Sleep quality" data-scale="sleep">
+</div>
+<label class="field">SLEEP HOURS<input id="hours" min="0" max="24" required type="number" step=".1" value="7">
+</label>
+</div>
+<div class="card">
+<h3>Energy</h3>
+<p class="sub scaleHint">1 · Low <span>5 · High</span>
+</p>
+<div class="scale" role="radiogroup" aria-label="Energy" data-scale="energy">
+</div>
+</div>
+<div class="card">
+<h3>Soreness</h3>
+<p class="sub scaleHint">1 · None <span>5 · Very sore</span>
+</p>
+<div class="scale" role="radiogroup" aria-label="Soreness" data-scale="soreness">
+</div>
+</div>
+<button id="saveDay" type="submit" class="cta">Save activity</button>
+<div id="saved" class="notice hidden" role="status">
+</div>
+</form>
+</section>
+<section id="compete" class="page">
+<div class="title">
+<small>ROAD TO 42 COMMUNITY</small>
+<h2>Run together.</h2>
+<p class="sub">Runners ranked by balanced Runner Power.</p>
+</div>
+<div id="leaderboard">
+</div>
+</section>
+<section id="more" class="page">
+<div class="title">
+<small>ROAD TO 42</small>
+<h2>Your runner.</h2>
+</div>
+<div class="card account">
+<img id="avatar" class="avatar" alt="">
+<div>
+<b id="accountName">
+</b>
+<div id="accountEmail" class="sub">
+</div>
+<div class="cloud">Progress synced</div>
+</div>
+</div>
+<div class="card">
+<div class="characterIntro">
+<div>
+<small>YOUR RUNNER</small>
+<h3 id="accountCharacterName">Wolf</h3>
+</div>
+<span class="sub">Tap to switch</span>
+</div>
+<div id="accountCharacters" class="characterGrid">
+</div>
+<div id="avatarStatus" class="pickerStatus" aria-live="polite">
+</div>
+</div>
+<div class="card menu">
+<button id="logout">↪ Log out</button>
+</div>
+</section>
+</main>
+<nav class="nav" aria-label="Main navigation">
+<button class="active" data-go="home"><svg class="uiIcon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10H3zM9 20v-7h6v7"/></svg><span>Home</span>
+</button>
+<button data-go="training"><svg class="uiIcon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10m8 10V4m8 16V7"/></svg><span>Training</span>
+</button>
+<button data-go="checkin"><svg class="uiIcon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span>Check-in</span>
+</button>
+<button data-go="compete"><svg class="uiIcon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8v7a4 4 0 0 1-8 0zM8 5H4v3a4 4 0 0 0 4 4m8-7h4v3a4 4 0 0 1-4 4m-4 2v6m-4 0h8"/></svg><span>Compete</span>
+</button>
+<button data-go="more"><svg class="uiIcon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span>Runner</span>
+</button>
+</nav>
+</section>
+</div>
+<script src="game.js?v=36" defer>
+</script>
+</body>
+</html>

@@ -1,1 +1,25 @@
-{"name":"Road to 42","short_name":"Road42","description":"Gamified endurance training and marathon progression","start_url":"./","display":"standalone","background_color":"#0b1426","theme_color":"#101b36","icons":[]}
+{
+  "name": "Road to 42",
+  "short_name": "Road42",
+  "description": "Gamified endurance training and marathon progression",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#081827",
+  "theme_color": "#081827",
+  "icons": [
+    {
+      "src": "assets/brand/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/brand/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "id": "./",
+  "scope": "./"
+}

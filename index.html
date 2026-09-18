@@ -132,7 +132,7 @@
 </div>
 </div>
 <div class="card journeyCard">
-<div class="sectionHeading"><div><small>YOUR JOURNEY</small><h3>Next checkpoint</h3></div><span id="journeyKm" class="sectionValue">0 km</span></div>
+<div class="sectionHeading"><div><small>MARATHON PREPARATION</small><h3>Next checkpoint</h3></div><span id="journeyKm" class="sectionValue">0 km logged</span></div>
 <div id="journeyMap" class="journeyMap" aria-label="Journey progress"></div>
 <p id="journeyMessage" class="sub"></p>
 </div>
@@ -232,7 +232,8 @@
 <section id="checkin" class="page">
 <div class="title">
 <small>DAILY INPUT</small>
-<h2>How are you today?</h2>
+<h2>How are you feeling?</h2>
+<p class="sub">This helps Road to 42 suggest the right training intensity for today.</p>
 </div>
 <form id="checkinForm">
 <div class="card">
@@ -276,6 +277,11 @@
 </p>
 <div class="scale" role="radiogroup" aria-label="Soreness" data-scale="soreness">
 </div>
+</div>
+<div id="readinessCard" class="card readinessCard hidden">
+<small>TODAY'S GUIDANCE</small>
+<h3 id="readinessTitle">Training recommendation</h3>
+<p id="readinessText" class="sub"></p>
 </div>
 <button id="saveDay" type="submit" class="cta">Save activity</button>
 <div id="saved" class="notice hidden" role="status">

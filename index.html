@@ -131,6 +131,11 @@
 </div>
 </div>
 </div>
+<div class="card journeyCard">
+<div class="sectionHeading"><div><small>YOUR JOURNEY</small><h3>Next checkpoint</h3></div><span id="journeyKm" class="sectionValue">0 km</span></div>
+<div id="journeyMap" class="journeyMap" aria-label="Journey progress"></div>
+<p id="journeyMessage" class="sub"></p>
+</div>
 <div class="stats">
 <div>
 <b id="total">0</b>
@@ -200,6 +205,14 @@
 <span>CONSISTENCY</span>
 </div>
 </div>
+</div>
+<div class="card rewardsCard">
+<div class="sectionHeading"><div><small>REWARDS</small><h3>Trail collection</h3></div><span id="rewardCount" class="sectionValue">0/6</span></div>
+<div id="rewardGrid" class="rewardGrid"></div>
+</div>
+<div class="card streakCard">
+<div class="sectionHeading"><div><small>CONSISTENCY</small><h3 id="streakTitle">Your rhythm</h3></div><span id="streakCount" class="sectionValue">0 days</span></div>
+<p id="streakMessage" class="sub"></p>
 </div>
 <div class="card">
 <b>TODAY</b>
@@ -275,6 +288,13 @@
 <h2>Run together.</h2>
 <p class="sub">Runners ranked by balanced Runner Power.</p>
 </div>
+<div class="card challengeCard">
+<small>THIS WEEK'S CHALLENGE</small>
+<h3>Go the distance together</h3>
+<p class="sub">Reach your weekly target and earn the Trailblazer reward. Compare progress with the community below.</p>
+<div class="challengeBar"><i id="challengeBarFill"></i></div>
+<div class="challengeMeta"><span id="challengeProgress">0 / 25 km</span><span id="challengeStatus">In progress</span></div>
+</div>
 <div id="leaderboard">
 </div>
 </section>
@@ -334,6 +354,8 @@
 <script src="game.js?v=39" defer>
 </script>
 <script src="repair.js?v=5" defer>
+</script>
+<script src="features.js?v=1" defer>
 </script>
 </body>
 </html>

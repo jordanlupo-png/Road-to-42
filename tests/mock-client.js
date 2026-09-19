@@ -29,7 +29,7 @@
   }
  }
  window.supabase={createClient:()=>({
-  from:table=>new Query(table),
+  from:table=>new Query(table),rpc:async(name,{p_rewards})=>{profile.earned_rewards=[...new Set([...(profile.earned_rewards||[]),...p_rewards])];return {data:null,error:null}},
   auth:{getSession:async()=>({data:{session:user?{user}:null},error:null}),onAuthStateChange:cb=>{authListener=cb},signOut:async()=>{user=null;authListener('SIGNED_OUT',null);return {error:null}},signInWithOAuth:async()=>({error:{message:'Fixture sign-in only'}})},
   functions:{invoke:async(name,{body})=>{
    if(name==='delete-account')return {data:null,error:{message:'Deletion disabled in browser fixture'}};

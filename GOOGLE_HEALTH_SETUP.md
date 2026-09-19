@@ -69,6 +69,8 @@ Disconnect stops future access while retaining imported training entries. Accoun
 
 - Node unit tests for running filters, XP thresholds, weekly consistency, local dates, distance/pace conversions and invalid records.
 - Rolled-back database fixture tests for character locking, import idempotency, updates, duplicate review, isolation, deletion tombstones and account cleanup.
+- Browser fixture checks at 320, 390 and 430 px: explicit character selection, setup completion, activity save/history, goal editing, level review, delete confirmation/cancel, duplicate review, wellbeing controls, leaderboard and failed-save retry. Document scrolling was visually verified. These are Chrome mobile-width checks, not physical Android or Safari tests.
+- Database reward-retention test: raising a goal preserves already earned badges.
 - Live unauthorized HTTP probes for health, webhook, worker and delete-account endpoints (all 401).
 - Supabase security advisors: health tables intentionally have no client policies; existing leaked-password protection warning concerns password auth, while this UI uses Google sign-in.
 

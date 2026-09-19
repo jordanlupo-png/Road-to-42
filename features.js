@@ -2,7 +2,7 @@
 'use strict';
 const app=window.Road42,C=window.Road42Core,$=id=>document.getElementById(id);
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let healthBusy=false,healthTimer=null,activeModal=null,returnFocus=null,lastHealth=0;
+let awarding=false,healthBusy=false,healthTimer=null,activeModal=null,returnFocus=null,lastHealth=0;
 const notice=(id,text)=>{$(id).textContent=text;$(id).classList.remove('hidden')};
 function openModal(id){returnFocus=document.activeElement;activeModal=$(id);activeModal.classList.remove('hidden');document.querySelectorAll('.app>section').forEach(e=>e.inert=true);activeModal.querySelector('input,button')?.focus()}
 function closeModal(){if(activeModal)activeModal.classList.add('hidden');activeModal=null;document.querySelectorAll('.app>section').forEach(e=>e.inert=false);returnFocus?.focus()}
@@ -22,6 +22,10 @@ function render(){
  $('journeyKm').textContent=m.xp.toFixed(1)+' km trained';
  $('journeyMessage').textContent='Prepare for your '+s.goal.toLowerCase()+' through consistent training and recovery. These milestones celebrate habits; they do not measure race readiness.';
  const rewards=C.rewards(s.logs,target);
+ const earned=new Set(p.earned_rewards||[]);for(const r of rewards)if(earned.has(r[1]))r[2]=true;
+ const newlyEarned=rewards.filter(r=>r[2]&&!earned.has(r[1])).map(r=>r[1]);
+ if(newlyEarned.length&&!awarding){awarding=true;const uid=app.user.id;app.sb.rpc('keep_runner_rewards',{p_rewards:newlyEarned}).then(({error})=>{if(!error&&app.user?.id===uid){p.earned_rewards=[...earned,...newlyEarned]}}).catch(()=>{}).finally(()=>{awarding=false})}
+
  $('rewardGrid').innerHTML=rewards.map(x=>'<button type="button" class="reward '+(x[2]?'unlocked':'')+'" aria-label="'+escape(x[1]+'. '+(x[2]?'Unlocked. ':'Locked. ')+x[3])+'" title="'+escape(x[3])+'"><b class="rewardIcon" aria-hidden="true">'+x[0]+'</b><span>'+x[1]+'</span></button>').join('');
  $('rewardGrid').querySelectorAll('button').forEach((b,i)=>b.onclick=()=>{$('rewardDetails').textContent=rewards[i][3]+' '+(rewards[i][2]?'Unlocked!':'Keep building at your own pace.')});
  $('rewardCount').textContent=rewards.filter(x=>x[2]).length+'/'+rewards.length;

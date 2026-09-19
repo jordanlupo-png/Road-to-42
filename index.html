@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="assets/brand/icon-192.png?v=39">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </script>
-<link rel="stylesheet" href="theme.css?v=41">
+<link rel="stylesheet" href="theme.css?v=42">
 </head>
 <body>
 <div class="app">
@@ -340,6 +340,7 @@
 </div>
 <div class="card menu profileActions">
 <button id="logout" class="logoutButton">↪ &nbsp;Log out</button>
+<button id="openDeleteAccount" class="deleteAccountButton" type="button">Delete account and data</button>
 </div>
 </section>
 </main>
@@ -356,12 +357,34 @@
 </button>
 </nav>
 </section>
+<div id="levelReviewModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="levelReviewTitle">
+<div class="modalCard">
+<small>LEVEL UP</small>
+<h2 id="levelReviewTitle">Review your weekly goal</h2>
+<p id="levelReviewText" class="sub"></p>
+<div class="goalComparison"><span>Current<strong id="currentWeeklyGoal">0 km</strong></span><span>Suggested<strong id="suggestedWeeklyGoal">0 km</strong></span></div>
+<button id="increaseWeeklyGoal" class="cta" type="button">Increase my weekly target</button>
+<button id="keepWeeklyGoal" class="secondaryButton" type="button">Keep my current target</button>
+<p class="modalFootnote">Only increase if the current distance feels comfortable. Consistency matters more than rushing.</p>
+</div>
+</div>
+<div id="deleteAccountModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="deleteAccountTitle">
+<div class="modalCard dangerModal">
+<small>PERMANENT ACTION</small>
+<h2 id="deleteAccountTitle">Delete your account?</h2>
+<p class="sub">This permanently removes your runner, activities, check-ins, rewards and Google login from Road to 42. It cannot be undone.</p>
+<label class="field">TYPE DELETE TO CONFIRM<input id="deleteAccountConfirmation" autocomplete="off" placeholder="DELETE"></label>
+<div id="deleteAccountMessage" class="notice hidden" role="status"></div>
+<button id="confirmDeleteAccount" class="dangerButton" type="button" disabled>Delete everything permanently</button>
+<button id="cancelDeleteAccount" class="secondaryButton" type="button">Cancel</button>
+</div>
+</div>
 </div>
 <script src="game.js?v=39" defer>
 </script>
 <script src="repair.js?v=5" defer>
 </script>
-<script src="features.js?v=2" defer>
+<script src="features.js?v=3" defer>
 </script>
 </body>
 </html>

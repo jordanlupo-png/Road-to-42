@@ -1,30 +1,150 @@
-(function(){'use strict';
-const URL='https://negkvlgimrthgonyvdqf.supabase.co',KEY='sb_publishable_RIt2HNAqPRO6vXMqWQEG3A_NJUHCj_t';
-const sb=window.supabase?.createClient(URL,KEY),$=id=>document.getElementById(id);
-let user=null,profile=null,logs=[],lastCelebration='';
-const goalKm={'5K':5,'10K':10,'Half Marathon':21.1,'Marathon':42.2};
-const levelThresholds=[25,60,120,200,300,425,575,750,950,1200];
-function weekStart(){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d}
-function weekKm(){const s=weekStart();return logs.filter(x=>new Date(x.activity_date+'T12:00:00')>=s&&+x.distance_km>0).reduce((a,x)=>a+(+x.distance_km||0),0)}
-function runs(){return logs.filter(x=>+x.distance_km>0&&['Easy','Quality','Long'].includes(x.activity_type))}
-function streak(){const days=new Set(runs().map(x=>x.activity_date));let d=new Date();d.setHours(0,0,0,0);let k=d.toISOString().slice(0,10);if(!days.has(k)){d.setDate(d.getDate()-1);k=d.toISOString().slice(0,10);if(!days.has(k))return 0}let n=0;while(days.has(k)){n++;d.setDate(d.getDate()-1);k=d.toISOString().slice(0,10)}return n}
-function renderJourney(){const box=$('journeyMap');if(!box||!profile)return;const total=runs().reduce((a,x)=>a+(+x.distance_km||0),0),target=goalKm[profile.goal]||42.2,stops=[['START',0],['5K',Math.min(5,target)],['10K',Math.min(10,target)],['HALF',Math.min(21.1,target)],['RACE READY',target]];box.innerHTML=stops.map((s,i)=>{const done=total>=s[1]&&s[1]>0,cur=!done&&i===Math.max(0,stops.findIndex(x=>total<x[1]));return '<div class="journeyStop '+(done?'done ':'')+(cur?'current':'')+'"><div class="journeyDot">'+(done?'✓':i+1)+'</div><span>'+s[0]+'</span></div>'}).join('');$('journeyKm').textContent=total.toFixed(1)+' km logged';$('journeyMessage').textContent=total>=target?'Race-ready training milestone reached. The 42.2 km marathon is the race itself.':(target-total).toFixed(1)+' km of training progression until the next checkpoint. Build gradually—the marathon is not your first 42.2 km run.'}
-function renderRewards(){const box=$('rewardGrid');if(!box||!profile)return;const all=runs(),total=all.reduce((a,x)=>a+(+x.distance_km||0),0),wk=weekKm(),rw=all.filter(x=>new Date(x.activity_date+'T12:00:00')>=weekStart()).length,st=streak(),runLogs=all.filter(x=>(+x.distance_km||0)>0),longest=runLogs.reduce((m,x)=>Math.max(m,+x.distance_km||0),0),quality=all.some(x=>['Quality','Long'].includes(x.activity_type)&&(+x.distance_km||0)>0),days=new Set(all.map(x=>x.activity_date)).size,items=[['👟','First step',total>=1],['🌱','5 km total',total>=5],['🔥','10 km total',total>=10],['🛤️','25 km total',total>=25],['🏔️','50 km total',total>=50],['🌍','100 km total',total>=100],['🏅','Weekly goal',wk>=(+profile.weekly_km_target||25)],['⚡','Three runs',rw>=3],['🚀','Five runs',rw>=5],['🦊','Long run',longest>=8],['🎯','Quality session',quality],['📅','Seven-day rhythm',st>=7],['🌿','Four-week rhythm',st>=28],['🔁','Comeback',days>=2],['🏃','42.2 km trained',total>=42.2],['🏁','Race-ready',total>=100&&st>=28],['💪','10 active days',days>=10],['✨','Training story',runLogs.length>=20]];box.innerHTML=items.map(x=>'<div class="reward '+(x[2]?'unlocked':'')+'"><b class="rewardIcon">'+x[0]+'</b><span>'+x[1]+'</span></div>').join('');$('rewardCount').textContent=items.filter(x=>x[2]).length+'/'+items.length}
-
-function renderStreak(){const n=streak();if(!$('streakCount'))return;$('streakCount').textContent=n+' day'+(n===1?'':'s');$('streakTitle').textContent=n?'Momentum unlocked':'Build your rhythm';$('streakMessage').textContent=n?'Keep it going. Your next consistency reward is '+Math.max(0,7-n)+' day'+(Math.max(0,7-n)===1?'':'s')+' away.':'No pressure—your comeback run starts whenever you are ready.'}
-function renderChallenge(){const target=+profile?.weekly_km_target||25,current=weekKm();if($('challengeBarFill'))$('challengeBarFill').style.width=Math.min(100,current/target*100)+'%';if($('challengeProgress'))$('challengeProgress').textContent=current.toFixed(1)+' / '+target.toFixed(1)+' km';if($('challengeStatus'))$('challengeStatus').textContent=current>=target?'Challenge complete':'In progress'}
-function currentLevel(){const xp=runs().reduce((a,x)=>a+(+x.distance_km||0),0);let level=1;while(level<10&&xp>=levelThresholds[level-1])level++;return level}
-function suggestedTarget(current){return Math.min(500,Math.round(current+Math.min(3,Math.max(1,current*.08))))}
-function reviewWeeklyGoal(){const modal=$('levelReviewModal');if(!modal||!profile)return;const level=currentLevel(),reviewed=+profile.last_goal_review_level||1;if(level<=reviewed||!modal.classList.contains('hidden'))return;const current=+profile.weekly_km_target||25,suggested=suggestedTarget(current);$('levelReviewTitle').textContent='Level '+level+' reached—review your goal';$('levelReviewText').textContent='Your runner has levelled up. Would you like to gradually increase your total weekly distance?';$('currentWeeklyGoal').textContent=current.toFixed(1)+' km';$('suggestedWeeklyGoal').textContent=suggested.toFixed(1)+' km';$('increaseWeeklyGoal').dataset.target=suggested;$('increaseWeeklyGoal').dataset.level=level;$('keepWeeklyGoal').dataset.level=level;modal.classList.remove('hidden')}
-async function saveGoalReview(increase){const btn=increase?$('increaseWeeklyGoal'):$('keepWeeklyGoal'),level=+(btn.dataset.level||currentLevel()),target=+($('increaseWeeklyGoal').dataset.target||profile.weekly_km_target);btn.disabled=true;const changes={last_goal_review_level:level};if(increase)changes.weekly_km_target=target;const {error}=await sb.from('profiles').update(changes).eq('id',user.id);btn.disabled=false;if(error){alert('Could not update your weekly target: '+error.message);return}profile.last_goal_review_level=level;if(increase)profile.weekly_km_target=target;$('levelReviewModal').classList.add('hidden');renderChallenge()}
-function renderAll(){if(profile){renderJourney();renderRewards();renderStreak();renderChallenge();reviewWeeklyGoal()}}
-async function load(){if(!sb)return;const ses=await sb.auth.getSession();user=ses.data.session?.user;if(!user)return;const p=await sb.from('profiles').select('display_name,weekly_km_target,goal,race_date,setup_completed,last_goal_review_level').eq('id',user.id).maybeSingle();if(p.error||!p.data?.setup_completed)return;profile=p.data;const a=await sb.from('activities').select('activity_date,activity_type,distance_km').eq('user_id',user.id).order('activity_date',{ascending:true});if(!a.error)logs=a.data||[];renderAll()}
-async function renderWeeklyCompetition(){const box=$('leaderboard');if(!box||!profile||!sb)return;const start=weekStart().toISOString().slice(0,10),ps=await sb.from('profiles').select('id,display_name').eq('is_public',true).eq('setup_completed',true),as=await sb.from('activities').select('user_id,distance_km,activity_date').gte('activity_date',start);if(ps.error||as.error)return;const rows=(ps.data||[]).map(x=>({id:x.id,name:x.display_name||'Runner',km:(as.data||[]).filter(a=>a.user_id===x.id).reduce((n,a)=>n+(+a.distance_km||0),0)})).sort((a,b)=>b.km-a.km),me=rows.findIndex(x=>x.id===user?.id);let old=box.querySelector('.weeklyRank');if(!old){old=document.createElement('div');old.className='weeklyRank';box.prepend(old)}old.innerHTML=me<0?'Log a run to join this week’s challenge.':'<b>Weekly distance</b><br>You are <b>#'+(me+1)+'</b> with <b>'+rows[me].km.toFixed(1)+' km</b>. '+(me>0?'Your next place is '+rows[me-1].name+'.':'You are leading the group!')}
-function celebration(){const form=$('checkinForm'),saved=$('saved');if(!form||!saved)return;let pending=0,pendingReadiness='';form.addEventListener('submit',()=>{pending=+$('km').value||0;pendingReadiness=$('readinessText')?.textContent||''},{capture:true});new MutationObserver(()=>{if(!saved.classList.contains('hidden')&&pending>0&&saved.textContent!==lastCelebration&&/saved/i.test(saved.textContent)){const msg='Run complete! <strong>+'+pending.toFixed(1)+' XP</strong> earned. Your runner moved '+pending.toFixed(1)+' km closer to the next checkpoint.'+(pendingReadiness?' '+pendingReadiness:'');saved.innerHTML=msg;saved.classList.add('runCelebration');lastCelebration=msg;setTimeout(()=>{pending=0;load()},700)}}).observe(saved,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class']})}
-function readiness(){const card=$('readinessCard'),title=$('readinessTitle'),text=$('readinessText');if(!card||!title||!text)return;const sleep=+$('hours').value||7,energy=+$('energy')?.querySelector('input:checked')?.value||3,soreness=+$('soreness')?.querySelector('input:checked')?.value||3,score=(sleep/8*5+energy+(6-soreness))/3;if(score<2.7){title.textContent='Recovery day recommended';text.textContent='Your answers suggest keeping today gentle. Choose Rest, an easy walk, mobility, or light strength. Your streak stays safe when you recover well.'}else if(score<3.8){title.textContent='Easy training recommended';text.textContent='You can train today, but keep the effort comfortable. An Easy run or Cross-train session will build consistency without overloading you.'}else{title.textContent='Ready for quality training';text.textContent='Your answers look positive. You can follow today’s planned run, while still listening to your body.'}card.classList.remove('hidden')}
-function bindReadiness(){const form=$('checkinForm');if(!form)return;form.addEventListener('input',readiness);form.addEventListener('change',readiness);readiness()}
-function bindGoalReview(){$('increaseWeeklyGoal')?.addEventListener('click',()=>saveGoalReview(true));$('keepWeeklyGoal')?.addEventListener('click',()=>saveGoalReview(false))}
-function bindAccountDeletion(){const open=$('openDeleteAccount'),modal=$('deleteAccountModal'),input=$('deleteAccountConfirmation'),confirm=$('confirmDeleteAccount'),cancel=$('cancelDeleteAccount'),message=$('deleteAccountMessage');if(!open||!modal||!input||!confirm||!cancel)return;open.addEventListener('click',()=>{input.value='';confirm.disabled=true;message.classList.add('hidden');modal.classList.remove('hidden');setTimeout(()=>input.focus(),50)});cancel.addEventListener('click',()=>modal.classList.add('hidden'));input.addEventListener('input',()=>confirm.disabled=input.value.trim()!=='DELETE');confirm.addEventListener('click',async()=>{if(input.value.trim()!=='DELETE')return;confirm.disabled=true;confirm.textContent='Deleting account…';message.classList.add('hidden');const {error}=await sb.functions.invoke('delete-account',{body:{confirm:true}});if(error){message.textContent='Account could not be deleted. Please try again.';message.classList.remove('hidden');confirm.disabled=false;confirm.textContent='Delete everything permanently';return}await sb.auth.signOut({scope:'local'});location.href='https://jordanlupo-png.github.io/Road-to-42/'})}
-document.addEventListener('click',e=>{const b=e.target.closest?.('[data-go="compete"]');if(b)setTimeout(renderWeeklyCompetition,700)});
-celebration();bindReadiness();bindGoalReview();bindAccountDeletion();setTimeout(load,900);setInterval(load,5000);
+(function(){
+'use strict';
+const app=window.Road42,C=window.Road42Core,$=id=>document.getElementById(id);
+const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let healthBusy=false,healthTimer=null,activeModal=null,returnFocus=null,lastHealth=0;
+const notice=(id,text)=>{$(id).textContent=text;$(id).classList.remove('hidden')};
+function openModal(id){returnFocus=document.activeElement;activeModal=$(id);activeModal.classList.remove('hidden');document.querySelectorAll('.app>section').forEach(e=>e.inert=true);activeModal.querySelector('input,button')?.focus()}
+function closeModal(){if(activeModal)activeModal.classList.add('hidden');activeModal=null;document.querySelectorAll('.app>section').forEach(e=>e.inert=false);returnFocus?.focus()}
+document.addEventListener('keydown',e=>{
+ if(!activeModal)return;
+ if(e.key==='Escape'&&activeModal.id==='deleteAccountModal'&&!$('confirmDeleteAccount').dataset.busy){closeModal();return}
+ if(e.key!=='Tab')return;
+ const items=[...activeModal.querySelectorAll('button:not(:disabled),input:not(:disabled),select,a[href]')];
+ if(e.shiftKey&&document.activeElement===items[0]){e.preventDefault();items.at(-1)?.focus()}
+ else if(!e.shiftKey&&document.activeElement===items.at(-1)){e.preventDefault();items[0]?.focus()}
+});
+function render(){
+ const s=app.state;if(!s)return;const m=C.stats(s.logs),p=s.profile,target=Number(p.weekly_km_target);
+ const stages=[['BEGIN',true],['FIRST RUN',m.runs.length>0],['2 WEEKS',m.bestWeeks>=2],['4 WEEKS',m.bestWeeks>=4],['8 WEEKS',m.bestWeeks>=8]];
+ const next=stages.findIndex(x=>!x[1]);
+ $('journeyMap').innerHTML=stages.map((x,i)=>'<div class="journeyStop '+(x[1]?'done':i===next?'current':'')+'"><div class="journeyDot">'+(x[1]?'✓':i+1)+'</div><span>'+x[0]+'</span></div>').join('');
+ $('journeyKm').textContent=m.xp.toFixed(1)+' km trained';
+ $('journeyMessage').textContent='Prepare for your '+s.goal.toLowerCase()+' through consistent training and recovery. These milestones celebrate habits; they do not measure race readiness.';
+ const rewards=C.rewards(s.logs,target);
+ $('rewardGrid').innerHTML=rewards.map(x=>'<button type="button" class="reward '+(x[2]?'unlocked':'')+'" aria-label="'+escape(x[1]+'. '+(x[2]?'Unlocked. ':'Locked. ')+x[3])+'" title="'+escape(x[3])+'"><b class="rewardIcon" aria-hidden="true">'+x[0]+'</b><span>'+x[1]+'</span></button>').join('');
+ $('rewardGrid').querySelectorAll('button').forEach((b,i)=>b.onclick=()=>{$('rewardDetails').textContent=rewards[i][3]+' '+(rewards[i][2]?'Unlocked!':'Keep building at your own pace.')});
+ $('rewardCount').textContent=rewards.filter(x=>x[2]).length+'/'+rewards.length;
+ $('streakCount').textContent=m.consecutive+' week'+(m.consecutive===1?'':'s');
+ $('streakTitle').textContent=m.consecutive?'Your training rhythm':'Build your rhythm';
+ $('streakMessage').textContent='A run in each week builds your rhythm. Rest days are part of the journey.';
+ $('challengeBarFill').style.width=Math.min(100,target>0?m.weekKm/target*100:0)+'%';
+ $('challengeProgress').textContent=m.weekKm.toFixed(1)+' / '+target.toFixed(1)+' km';
+ $('challengeStatus').textContent=target>0&&m.weekKm>=target?'Goal reached':'In progress';
+ if(!$('runnerSettings').contains(document.activeElement)){
+  $('editWeeklyKm').value=target;$('editRuns').value=p.runs_per_week;$('editGoal').value=p.goal;$('editRaceDate').value=p.race_date;$('editPublic').checked=p.is_public;
+ }
+ if(m.level>(p.last_goal_review_level||1)&&!activeModal){
+  const proposed=Math.min(500,Math.round((target+Math.min(3,target*.08))*10)/10);
+  $('levelReviewTitle').textContent='Level '+m.level+' reached';
+  $('levelReviewText').textContent='Would you like to review your weekly distance? Keeping your current goal is always an option.';
+  $('currentWeeklyGoal').textContent=target.toFixed(1)+' km';$('suggestedWeeklyGoal').textContent=proposed.toFixed(1)+' km';
+  $('increaseWeeklyGoal').dataset.target=proposed;$('increaseWeeklyGoal').dataset.level=m.level;
+  openModal('levelReviewModal');
+ }
+}
+async function updateProfile(changes){
+ const uid=app.user?.id;if(!uid)throw new Error('Sign in again.');
+ const {data,error}=await app.sb.from('profiles').update(changes).eq('id',uid).select('id').single();
+ if(error||!data)throw new Error('Your changes could not be saved. Please try again.');
+ await app.reload();
+}
+async function review(increase){
+ const buttons=[$('increaseWeeklyGoal'),$('keepWeeklyGoal')];buttons.forEach(b=>b.disabled=true);
+ try{const changes={last_goal_review_level:Number($('increaseWeeklyGoal').dataset.level)};if(increase)changes.weekly_km_target=Number($('increaseWeeklyGoal').dataset.target);await updateProfile(changes);closeModal()}
+ catch(err){$('levelReviewText').textContent=err.message}finally{buttons.forEach(b=>b.disabled=false)}
+}
+$('increaseWeeklyGoal').onclick=()=>review(true);$('keepWeeklyGoal').onclick=()=>review(false);
+$('runnerSettings').onsubmit=async e=>{
+ e.preventDefault();const form=e.currentTarget,btn=form.querySelector('button');if(btn.disabled||!form.reportValidity())return;
+ btn.disabled=true;
+ try{await updateProfile({weekly_km_target:Number($('editWeeklyKm').value),runs_per_week:Number($('editRuns').value),goal:$('editGoal').value,race_date:$('editRaceDate').value,is_public:$('editPublic').checked});notice('settingsMessage','Goals saved.')}
+ catch(err){notice('settingsMessage',err.message)}finally{btn.disabled=false}
+};
+function wellbeing(){
+ const value=n=>Number(document.querySelector('input[name="'+n+'"]:checked')?.value||3);
+ $('readinessCard').classList.toggle('hidden',!$('wellbeingEnabled').checked);
+ $('readinessTitle').textContent='A note for your training diary';
+ $('readinessText').textContent='Sleep: '+$('hours').value+' hours · Energy: '+value('energy')+'/5 · Soreness: '+value('soreness')+'/5. These are your own observations, not a test of whether you are ready to run.';
+}
+$('checkinForm').addEventListener('input',wellbeing);wellbeing();
+const healthErrors={not_configured:'Google Health is waiting for the app’s Google setup. You can still log runs manually.',unauthorized:'Please sign in again.',reconnect_required:'Google permission has expired. Reconnect to continue syncing.',rate_limited:'Google has paused requests temporarily. Sync will retry automatically.',provider_unavailable:'Google Health is temporarily unavailable. Sync will retry.',request_failed:'Could not complete the request. Please try again.',sync_incomplete:'Your import could not finish. Please retry.',already_reviewed:'This run has already been reviewed. Refreshing the list.'};
+async function healthCall(body){
+ const result=await app.sb.functions.invoke('google-health',{body});
+ if(result.error){
+  let code;try{code=(await result.error.context.json()).error}catch{}
+  throw new Error(healthErrors[code]||'Google Health could not be reached. Please try again.');
+ }
+ if(result.data?.error)throw new Error(healthErrors[result.data.error]||'Could not complete the request.');
+ return result.data;
+}
+async function healthStatus(){
+ if(!app.user||!app.state||healthBusy)return;healthBusy=true;const uid=app.user.id;
+ try{
+  const h=await healthCall({action:'status'});if(app.user?.id!==uid)return;
+  $('connectHealth').classList.toggle('hidden',h.connected&&!h.reconnect_required);
+  $('connectHealth').disabled=!h.configured;
+  $('connectHealth').textContent=h.reconnect_required?'Reconnect Google Health':'Connect Google Health';
+  $('syncHealth').classList.toggle('hidden',!h.connected||h.reconnect_required);
+  $('syncHealth').disabled=h.syncing;
+  $('disconnectHealth').classList.toggle('hidden',!h.connected);
+  let text=!h.configured?healthErrors.not_configured:!h.connected?'Connect your own Google Health account to import runs.':h.reconnect_required?healthErrors.reconnect_required:h.last_error?(healthErrors[h.last_error]||'Sync will retry automatically.'):h.syncing?'Syncing your running sessions…':h.last_sync_at?'Last synced '+new Date(h.last_sync_at).toLocaleString():'Connected. Waiting for the first sync.';
+  $('healthStatus').textContent=text;
+  const box=$('healthDuplicates');box.innerHTML='';
+  for(const item of h.pending||[]){
+   const run=item.run,matches=app.state.logs.filter(l=>l.source==='manual'&&C.isRun(l)&&l.date.slice(0,10)===run.activity_date&&Math.abs(l.km-run.distance_km)<=Math.max(.2,run.distance_km*.05));
+   const div=document.createElement('div');div.className='healthReview';
+   div.innerHTML='<h4>Review a possible duplicate</h4><p>'+escape(run.activity_date)+' · '+Number(run.distance_km).toFixed(2)+' km from Google Health</p><p class="sub">This run is waiting and is not counted in your XP yet.</p>';
+   if(matches.length){const select=document.createElement('select');select.setAttribute('aria-label','Matching manual run');select.innerHTML=matches.map(l=>'<option value="'+escape(l.id)+'">'+escape(l.type)+' · '+l.km.toFixed(1)+' km · '+l.mins+' min</option>').join('');div.append(select)}
+   for(const [label,resolution] of [['Replace matching manual run','link'],['These are separate runs','separate'],['Skip this import','ignore']]){
+    if(resolution==='link'&&!matches.length)continue;
+    const btn=document.createElement('button');btn.type='button';btn.className='secondaryButton';btn.textContent=label;
+    btn.onclick=async()=>{div.querySelectorAll('button').forEach(b=>b.disabled=true);try{await healthCall({action:'resolve',external_id:item.external_id,resolution,manual_id:div.querySelector('select')?.value});await app.reload();await healthStatus()}catch(err){notice('healthStatus',err.message)}finally{div.querySelectorAll('button').forEach(b=>b.disabled=false)}};
+    div.append(btn);
+   }box.append(div);
+  }
+  const stamp=h.last_sync_at?Date.parse(h.last_sync_at):0;
+  if(stamp>lastHealth){lastHealth=stamp;await app.reload()}
+  clearTimeout(healthTimer);
+  healthTimer=setTimeout(()=>{if(!document.hidden)healthStatus()},h.syncing?5000:60000);
+ }catch(err){if(app.user?.id===uid)notice('healthStatus',err.message)}finally{healthBusy=false}
+}
+$('connectHealth').onclick=async()=>{
+ const btn=$('connectHealth');btn.disabled=true;
+ try{const r=await healthCall({action:'connect',consent:true});location.assign(r.url)}catch(err){notice('healthStatus',err.message);btn.disabled=false}
+};
+$('syncHealth').onclick=async()=>{const btn=$('syncHealth');btn.disabled=true;try{await healthCall({action:'sync'});await healthStatus()}catch(err){notice('healthStatus',err.message);btn.disabled=false}};
+$('disconnectHealth').onclick=async()=>{
+ if(!confirm('Disconnect Google Health? Previously imported runs stay in your game.'))return;
+ try{await healthCall({action:'disconnect',confirm:true});await healthStatus()}catch(err){notice('healthStatus',err.message)}
+};
+function openDelete(){
+ $('deleteAccountConfirmation').value='';$('confirmDeleteAccount').disabled=true;$('deleteAccountMessage').classList.add('hidden');
+ $('deletingIdentity').textContent='Account: '+(app.user?.email||'Current signed-in account');openModal('deleteAccountModal');
+}
+$('openDeleteAccount').onclick=openDelete;$('setupDeleteAccount').onclick=openDelete;
+$('cancelDeleteAccount').onclick=()=>{if(!$('confirmDeleteAccount').dataset.busy)closeModal()};
+$('deleteAccountConfirmation').oninput=()=>{$('confirmDeleteAccount').disabled=$('deleteAccountConfirmation').value.trim()!=='DELETE'};
+$('confirmDeleteAccount').onclick=async()=>{
+ const btn=$('confirmDeleteAccount');if(btn.disabled||btn.dataset.busy)return;
+ btn.disabled=true;btn.dataset.busy='true';$('cancelDeleteAccount').disabled=true;btn.textContent='Deleting account…';
+ try{
+  const {data,error}=await app.sb.functions.invoke('delete-account',{body:{confirm:true}});
+  if(error||!data?.deleted)throw new Error('Account could not be deleted. Your account remains available; please try again.');
+  await app.sb.auth.signOut({scope:'local'});location.replace(location.pathname);
+ }catch(err){notice('deleteAccountMessage',err.message);btn.disabled=false}
+ finally{delete btn.dataset.busy;btn.textContent='Delete everything permanently';$('cancelDeleteAccount').disabled=false}
+};
+document.addEventListener('road42:updated',()=>{render();if(!lastHealth)healthStatus()});
+document.addEventListener('road42:signedout',()=>{clearTimeout(healthTimer);closeModal();lastHealth=0;$('healthDuplicates').innerHTML=''});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)healthStatus()});
+const callback=new URLSearchParams(location.search).get('health');
+if(callback){
+ const messages={connected:'Google Health connected. Your runs are being imported.',cancelled:'Connection cancelled. You can try again whenever you are ready.',expired:'The connection link expired. Please reconnect.',permission_required:'Allow activity access to sync your runs.',already_linked:'This Google Health account is already linked to another runner.',different_health_account:'Disconnect the current Google Health account before choosing another.'};
+ notice('healthStatus',messages[callback]||'Google Health could not connect. Please try again.');
+ history.replaceState(null,'',location.pathname);
+ document.addEventListener('road42:updated',()=>app.go('more'),{once:true});
+}
+const detail=document.createElement('p');detail.id='rewardDetails';detail.className='sub';detail.setAttribute('role','status');detail.textContent='Tap a reward to see how to earn it.';$('rewardGrid').after(detail);
+if(app.state){render();healthStatus()}
 })();

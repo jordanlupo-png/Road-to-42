@@ -14,9 +14,9 @@
 <link rel="manifest" href="manifest.json?v=40">
 <link rel="icon" type="image/png" href="assets/brand/icon-192.png?v=39">
 <link rel="apple-touch-icon" href="assets/brand/icon-192.png?v=39">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4">
 </script>
-<link rel="stylesheet" href="theme.css?v=42">
+<link rel="stylesheet" href="theme.css?v=43">
 </head>
 <body>
 <div class="app">
@@ -42,6 +42,7 @@
 </button>
 </div>
 <p class="authHint">One Google account. Your runner, your progress, everywhere.</p>
+<p class="sub"><a href="privacy.html">Privacy</a> · <a href="terms.html">Using Road to 42</a></p>
 <div id="authMsg" class="notice hidden" role="status">
 </div>
 </div>
@@ -62,7 +63,7 @@
 <div class="characterIntro">
 <div>
 <small>CHOOSE YOUR RUNNER</small>
-<h3 id="profileCharacterName">Wolf</h3>
+<h3 id="profileCharacterName">Choose an animal</h3>
 </div>
 <span class="sub">Evolves as you level up</span>
 </div>
@@ -72,7 +73,7 @@
 <label class="field">YOUR NAME<input id="newName" required maxlength="50" autocomplete="given-name">
 </label>
 <div class="grid">
-<label class="field">CURRENT WEEKLY KM<input id="baseKm" min="0" max="500" step="0.1" required type="number" value="25">
+<label class="field">WEEKLY RUNNING GOAL (KM)<input id="baseKm" min="1" max="500" step="0.1" required type="number" value="25">
 </label>
 <label class="field">RUNS PER WEEK<input id="baseRuns" min="1" max="21" required type="number" value="3">
 </label>
@@ -88,11 +89,12 @@
 <label class="field">RACE DATE<input id="raceDate" required type="date" value="2027-03-14">
 </label>
 </div>
-<p class="sub">Your runner name and training progress appear on the community leaderboard. Your email stays private.</p>
+<label class="checkLabel"><input id="publicProfile" type="checkbox"> Show my runner and training progress on the community leaderboard</label><p class="sub">Your email stays private. You can change this choice in Runner settings.</p>
 <button id="join" type="submit" class="cta">Start my journey</button>
 <div id="profileMsg" class="notice hidden" role="status">
 </div>
 </form>
+<button type="button" id="setupDeleteAccount" class="textButton">Delete this trial account</button>
 <button type="button" id="setupLogout" class="textButton">Use a different Google account</button>
 </div>
 </section>
@@ -132,7 +134,7 @@
 </div>
 </div>
 <div class="card journeyCard">
-<div class="sectionHeading"><div><small>MARATHON PREPARATION</small><h3>Next checkpoint</h3></div><span id="journeyKm" class="sectionValue">0 km logged</span></div>
+<div class="sectionHeading"><div><small>TRAINING JOURNEY</small><h3>Next checkpoint</h3></div><span id="journeyKm" class="sectionValue">0 km logged</span></div>
 <div id="journeyMap" class="journeyMap" aria-label="Journey progress"></div>
 <p id="journeyMessage" class="sub"></p>
 </div>
@@ -232,8 +234,8 @@
 <section id="checkin" class="page">
 <div class="title">
 <small>DAILY INPUT</small>
-<h2>How are you feeling?</h2>
-<p class="sub">This helps Road to 42 suggest the right training intensity for today.</p>
+<h2>Log your training.</h2>
+<p class="sub">Record a run or a recovery day. An optional wellbeing note helps you reflect on how training feels.</p>
 </div>
 <form id="checkinForm">
 <div class="card">
@@ -247,14 +249,15 @@
 <button type="button" data-type="Cross">Cross-train</button>
 </div>
 <div class="grid">
-<label class="field">DISTANCE KM<input id="km" type="number" min="0" max="500" step=".1" required value="0">
+<label class="field">DISTANCE KM<input id="km" disabled type="number" min="0" max="500" step=".1" required value="0">
 </label>
 <label class="field">MINUTES<input id="mins" type="number" min="0" max="10080" step="0.1" required value="0">
 </label>
 </div>
-<label class="field">PACE (OPTIONAL)<input id="pace" placeholder="6:30" inputmode="decimal" pattern="[0-9]{1,2}:[0-5][0-9]" title="Minutes and seconds, for example 6:30">
+<label class="field">PACE (OPTIONAL)<input id="pace" disabled placeholder="6:30" inputmode="decimal" pattern="[0-9]{1,2}:[0-5][0-9]" title="Minutes and seconds, for example 6:30">
 </label>
 </div>
+<details class="wellbeing"><summary>How are you feeling? (optional)</summary><label class="checkLabel"><input type="checkbox" id="wellbeingEnabled"> Save a wellbeing note with this activity</label>
 <div class="card">
 <h3>Sleep quality</h3>
 <p class="sub scaleHint">1 · Poor <span>5 · Restful</span>
@@ -279,10 +282,11 @@
 </div>
 </div>
 <div id="readinessCard" class="card readinessCard hidden">
-<small>TODAY'S GUIDANCE</small>
+<small>YOUR WELLBEING NOTE</small>
 <h3 id="readinessTitle">Training recommendation</h3>
 <p id="readinessText" class="sub"></p>
 </div>
+</details>
 <button id="saveDay" type="submit" class="cta">Save activity</button>
 <div id="saved" class="notice hidden" role="status">
 </div>
@@ -297,7 +301,7 @@
 <div class="card challengeCard">
 <small>THIS WEEK'S CHALLENGE</small>
 <h3>Go the distance together</h3>
-<p class="sub">Reach your weekly target and earn the Trailblazer reward. Compare progress with the community below.</p>
+<p class="sub">Reach your weekly target and earn the Weekly goal reward. Compare progress with the community below.</p>
 <div class="challengeBar"><i id="challengeBarFill"></i></div>
 <div class="challengeMeta"><span id="challengeProgress">0 / 25 km</span><span id="challengeStatus">In progress</span></div>
 </div>
@@ -338,6 +342,23 @@
 </div>
 </div>
 </div>
+<form id="runnerSettings" class="card">
+<h3>Your training goals</h3>
+<div class="grid"><label class="field">WEEKLY KM<input id="editWeeklyKm" type="number" min="1" max="500" step="0.1" required></label><label class="field">RUNS PER WEEK<input id="editRuns" type="number" min="1" max="21" required></label></div>
+<div class="grid"><label class="field">GOAL<select id="editGoal"><option>Marathon</option><option>Half Marathon</option><option>10K</option><option>5K</option></select></label><label class="field">RACE DATE<input id="editRaceDate" type="date" required></label></div>
+<label class="checkLabel"><input id="editPublic" type="checkbox"> Show my runner and training progress on the leaderboard</label>
+<button class="secondaryButton" type="submit">Save goals</button><p id="settingsMessage" role="status" class="sub"></p>
+</form>
+<div id="healthCard" class="card">
+<small>CONNECTED RUNS</small><h3>Google Health</h3>
+<p class="sub">Import running sessions from 14 September 2026. Walking and cycling do not count. Sync your watch with its companion app first.</p>
+<p class="sub">Run dates, distances and durations are saved to Road to 42. Your training follows your leaderboard privacy choice above.</p>
+<p id="healthStatus" role="status" class="sub">Checking connection…</p>
+<button id="connectHealth" class="secondaryButton" type="button">Connect Google Health</button>
+<button id="syncHealth" class="secondaryButton hidden" type="button">Sync runs now</button>
+<button id="disconnectHealth" class="textButton hidden" type="button">Disconnect Google Health</button>
+<div id="healthDuplicates"></div>
+</div>
 <div class="card menu profileActions">
 <button id="logout" class="logoutButton">↪ &nbsp;Log out</button>
 <button id="openDeleteAccount" class="deleteAccountButton" type="button">Delete account and data</button>
@@ -372,7 +393,8 @@
 <div class="modalCard dangerModal">
 <small>PERMANENT ACTION</small>
 <h2 id="deleteAccountTitle">Delete your account?</h2>
-<p class="sub">This permanently removes your runner, activities, check-ins, rewards and Google login from Road to 42. It cannot be undone.</p>
+<p class="sub">This permanently removes your runner, activities, check-ins, rewards and Google Health connection from Road to 42. Your Google and Fitbit accounts are not deleted. It cannot be undone.</p>
+<p id="deletingIdentity" class="sub"></p>
 <label class="field">TYPE DELETE TO CONFIRM<input id="deleteAccountConfirmation" autocomplete="off" placeholder="DELETE"></label>
 <div id="deleteAccountMessage" class="notice hidden" role="status"></div>
 <button id="confirmDeleteAccount" class="dangerButton" type="button" disabled>Delete everything permanently</button>
@@ -380,11 +402,11 @@
 </div>
 </div>
 </div>
-<script src="game.js?v=39" defer>
+<script src="core.js?v=1" defer></script>
+<script src="game.js?v=40" defer>
 </script>
-<script src="repair.js?v=5" defer>
-</script>
-<script src="features.js?v=3" defer>
+<script src="features.js?v=4" defer>
 </script>
 </body>
 </html>
+

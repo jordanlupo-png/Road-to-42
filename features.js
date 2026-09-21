@@ -3,10 +3,10 @@
 const app=window.Road42,C=window.Road42Core,$=id=>document.getElementById(id);
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let awarding=false,healthBusy=false,healthTimer=null,activeModal=null,returnFocus=null,lastHealth=0;
-let notifications=[],notificationChannel=null,notificationUser=null,toastTimer=null,evolutionBusy=false,currentEvolutionId=null,evolutionQueue=[];
+let notifications=[],notificationChannel=null,notificationUser=null,toastTimer=null,evolutionBusy=false,currentEvolutionId=null,evolutionQueue=[],goalReviewTimer=null,pendingGoalReview=null;
 const notice=(id,text)=>{$(id).textContent=text;$(id).classList.remove('hidden')};
 function openModal(id){returnFocus=document.activeElement;activeModal=$(id);activeModal.classList.remove('hidden');document.querySelectorAll('.app>section').forEach(e=>e.inert=true);activeModal.querySelector('input,button')?.focus()}
-function closeModal(){if(activeModal)activeModal.classList.add('hidden');activeModal=null;document.querySelectorAll('.app>section').forEach(e=>e.inert=false);returnFocus?.focus();pumpEvolution()}
+function closeModal(){if(activeModal)activeModal.classList.add('hidden');activeModal=null;document.querySelectorAll('.app>section').forEach(e=>e.inert=false);returnFocus?.focus();pumpEvolution();if(!evolutionBusy)showGoalReview()}
 document.addEventListener('keydown',e=>{
  if(!activeModal)return;
  if(e.key==='Escape'&&(activeModal.id!=='deleteAccountModal'||!$('confirmDeleteAccount').dataset.busy)){closeModal();return}
@@ -39,14 +39,18 @@ function render(){
  if(!$('runnerSettings').contains(document.activeElement)){
   $('editWeeklyKm').value=target;$('editRuns').value=p.runs_per_week;$('editGoal').value=p.goal;$('editRaceDate').value=p.race_date;$('editPublic').checked=p.is_public;
  }
- if(m.level>(p.last_goal_review_level||1)&&!activeModal){
-  const proposed=Math.min(500,Math.round((target+Math.min(3,target*.08))*10)/10);
-  $('levelReviewTitle').textContent='Level '+m.level+' reached';
-  $('levelReviewText').textContent='Would you like to review your weekly distance? Keeping your current goal is always an option.';
-  $('currentWeeklyGoal').textContent=target.toFixed(1)+' km';$('suggestedWeeklyGoal').textContent=proposed.toFixed(1)+' km';
-  $('increaseWeeklyGoal').dataset.target=proposed;$('increaseWeeklyGoal').dataset.level=m.level;
-  openModal('levelReviewModal');
+ if(m.level>(p.last_goal_review_level||1)){
+  pendingGoalReview={level:m.level,target,proposed:Math.min(500,Math.round((target+Math.min(3,target*.08))*10)/10)};
+  clearTimeout(goalReviewTimer);goalReviewTimer=setTimeout(showGoalReview,700);
  }
+}
+function showGoalReview(){
+ clearTimeout(goalReviewTimer);goalReviewTimer=null;if(!pendingGoalReview||activeModal||evolutionBusy)return;
+ const {level,target,proposed}=pendingGoalReview;pendingGoalReview=null;
+ $('levelReviewTitle').textContent='Level '+level+' reached';
+ $('levelReviewText').textContent='Would you like to review your weekly distance? Keeping your current goal is always an option.';
+ $('currentWeeklyGoal').textContent=target.toFixed(1)+' km';$('suggestedWeeklyGoal').textContent=proposed.toFixed(1)+' km';
+ $('increaseWeeklyGoal').dataset.target=proposed;$('increaseWeeklyGoal').dataset.level=level;openModal('levelReviewModal');
 }
 async function updateProfile(changes){
  const uid=app.user?.id;if(!uid)throw new Error('Sign in again.');
@@ -102,7 +106,7 @@ function pumpEvolution(){
 }
 async function finishEvolution(){
  const id=Number($('finishEvolution').dataset.notificationId);$('evolutionModal').classList.add('hidden');document.querySelectorAll('.app>section').forEach(e=>e.inert=false);evolutionBusy=false;currentEvolutionId=null;
- await markNotificationRead(id);pumpEvolution();
+ await markNotificationRead(id);pumpEvolution();if(!evolutionBusy)showGoalReview();
 }
 async function loadNotifications(){
  if(!app.user||!app.state)return;const uid=app.user.id;
@@ -198,7 +202,7 @@ $('confirmDeleteAccount').onclick=async()=>{
  finally{delete btn.dataset.busy;btn.textContent='Delete everything permanently';$('cancelDeleteAccount').disabled=false}
 };
 document.addEventListener('road42:updated',()=>{render();loadNotifications();if(!lastHealth)healthStatus()});
-document.addEventListener('road42:signedout',()=>{clearTimeout(healthTimer);clearTimeout(toastTimer);if(notificationChannel)app.sb.removeChannel(notificationChannel);notificationChannel=null;notificationUser=null;notifications=[];evolutionQueue=[];evolutionBusy=false;currentEvolutionId=null;$('evolutionModal').classList.add('hidden');closeModal();lastHealth=0;$('healthDuplicates').innerHTML=''});
+document.addEventListener('road42:signedout',()=>{clearTimeout(healthTimer);clearTimeout(toastTimer);clearTimeout(goalReviewTimer);pendingGoalReview=null;if(notificationChannel)app.sb.removeChannel(notificationChannel);notificationChannel=null;notificationUser=null;notifications=[];evolutionQueue=[];evolutionBusy=false;currentEvolutionId=null;$('evolutionModal').classList.add('hidden');closeModal();lastHealth=0;$('healthDuplicates').innerHTML=''});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){healthStatus();loadNotifications()}});
 const callback=new URLSearchParams(location.search).get('health');
 if(callback){

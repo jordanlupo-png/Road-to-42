@@ -12,10 +12,13 @@ create table if not exists public.runner_notifications (
 
 create index if not exists runner_notifications_recipient_created_idx
   on public.runner_notifications(recipient_id, created_at desc);
+create index if not exists runner_notifications_actor_idx
+  on public.runner_notifications(actor_id);
 
 alter table public.runner_notifications enable row level security;
-revoke all on public.runner_notifications from public, anon;
-grant select, update on public.runner_notifications to authenticated;
+revoke all on public.runner_notifications from public, anon, authenticated;
+grant select on public.runner_notifications to authenticated;
+grant update(read_at) on public.runner_notifications to authenticated;
 
 create policy "Runners read own notifications"
 on public.runner_notifications for select to authenticated

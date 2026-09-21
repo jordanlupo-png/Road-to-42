@@ -3,12 +3,13 @@
 const app=window.Road42,C=window.Road42Core,$=id=>document.getElementById(id);
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let awarding=false,healthBusy=false,healthTimer=null,activeModal=null,returnFocus=null,lastHealth=0;
+let notifications=[],notificationChannel=null,notificationUser=null,toastTimer=null,evolutionBusy=false,currentEvolutionId=null,evolutionQueue=[];
 const notice=(id,text)=>{$(id).textContent=text;$(id).classList.remove('hidden')};
 function openModal(id){returnFocus=document.activeElement;activeModal=$(id);activeModal.classList.remove('hidden');document.querySelectorAll('.app>section').forEach(e=>e.inert=true);activeModal.querySelector('input,button')?.focus()}
-function closeModal(){if(activeModal)activeModal.classList.add('hidden');activeModal=null;document.querySelectorAll('.app>section').forEach(e=>e.inert=false);returnFocus?.focus()}
+function closeModal(){if(activeModal)activeModal.classList.add('hidden');activeModal=null;document.querySelectorAll('.app>section').forEach(e=>e.inert=false);returnFocus?.focus();pumpEvolution()}
 document.addEventListener('keydown',e=>{
  if(!activeModal)return;
- if(e.key==='Escape'&&activeModal.id==='deleteAccountModal'&&!$('confirmDeleteAccount').dataset.busy){closeModal();return}
+ if(e.key==='Escape'&&(activeModal.id!=='deleteAccountModal'||!$('confirmDeleteAccount').dataset.busy)){closeModal();return}
  if(e.key!=='Tab')return;
  const items=[...activeModal.querySelectorAll('button:not(:disabled),input:not(:disabled),select,a[href]')];
  if(e.shiftKey&&document.activeElement===items[0]){e.preventDefault();items.at(-1)?.focus()}
@@ -59,6 +60,63 @@ async function review(increase){
  catch(err){$('levelReviewText').textContent=err.message}finally{buttons.forEach(b=>b.disabled=false)}
 }
 $('increaseWeeklyGoal').onclick=()=>review(true);$('keepWeeklyGoal').onclick=()=>review(false);
+const notificationIcon=kind=>kind==='xp'?'⚡':kind==='badge'?'🏅':'✨';
+const evolutionNames=['The Beginning','Building Habits','Getting Stronger','Peak Form','Champion'];
+const avatarStage=level=>['01','05','10','15','20'][Math.min(4,Math.floor((Math.max(1,level)-1)/2))];
+const avatarPath=(character,level)=>'assets/avatars/'+character+'/'+character+'_'+avatarStage(level)+'.webp';
+function drawNotifications(){
+ const unread=notifications.filter(n=>!n.read_at).length;
+ $('notificationCount').textContent=unread>99?'99+':unread;$('notificationCount').classList.toggle('hidden',!unread);
+ $('notificationList').innerHTML=notifications.length?notifications.map(n=>'<article class="notificationItem '+(!n.read_at?'unread':'')+'"><div class="notificationIcon" aria-hidden="true">'+notificationIcon(n.kind)+'</div><div><b>'+escape(n.title)+'</b><span>'+escape(n.body)+'</span><time datetime="'+escape(n.created_at)+'">'+new Date(n.created_at).toLocaleString()+'</time></div></article>').join(''):'<div class="notificationEmpty">No community news yet. Your friends’ runs, badges and level-ups will appear here.</div>';
+}
+function showToast(n){
+ if(document.hidden||n.actor_id===app.user?.id)return;
+ $('notificationToast').innerHTML='<span aria-hidden="true">'+notificationIcon(n.kind)+'</span> '+escape(n.body);
+ $('notificationToast').classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('notificationToast').classList.add('hidden'),5000);
+}
+async function markNotificationRead(id){
+ const n=notifications.find(x=>x.id===id);if(!n||n.read_at)return;
+ const stamp=new Date().toISOString();const {error}=await app.sb.from('runner_notifications').update({read_at:stamp}).eq('id',id).is('read_at',null);
+ if(!error){n.read_at=stamp;drawNotifications()}
+}
+async function markAllNotificationsRead(){
+ const ids=notifications.filter(n=>!n.read_at).map(n=>n.id);if(!ids.length)return;
+ const stamp=new Date().toISOString();const {error}=await app.sb.from('runner_notifications').update({read_at:stamp}).in('id',ids);
+ if(!error){notifications.forEach(n=>{if(ids.includes(n.id))n.read_at=stamp});drawNotifications()}
+}
+function queueEvolution(n){if(currentEvolutionId===n.id||evolutionQueue.some(x=>x.id===n.id))return;evolutionQueue.push(n);pumpEvolution()}
+function pumpEvolution(){
+ if(evolutionBusy||activeModal||!evolutionQueue.length)return;
+ const n=evolutionQueue.shift(),meta=n.metadata||{},level=Number(meta.level)||1,from=Math.max(1,Number(meta.from_level)||level-1),character=meta.character||app.state?.character||'wolf';
+ const changed=avatarStage(from)!==avatarStage(level),name=character.charAt(0).toUpperCase()+character.slice(1);
+ evolutionBusy=true;currentEvolutionId=n.id;document.querySelectorAll('.app>section').forEach(e=>e.inert=true);
+ $('evolutionModal').classList.remove('hidden','revealed');$('evolutionKicker').textContent=changed?'EVOLUTION':'LEVEL UP';
+ $('evolutionTitle').textContent=changed?'What? Your '+name+' is evolving!':name+' reached Level '+level+'!';
+ $('evolutionLead').textContent=changed?'Your training is changing your runner…':'Your training has made your runner stronger.';
+ $('evolutionOldAvatar').src=avatarPath(character,from);$('evolutionOldAvatar').alt=name+' before level '+level;
+ $('evolutionNewAvatar').src=avatarPath(character,level);$('evolutionNewAvatar').alt=name+' at level '+level;
+ $('evolutionResult').textContent=changed?'Evolution complete!':'Level '+level+' unlocked!';
+ $('evolutionMessage').textContent=changed?'Your '+name+' has reached '+evolutionNames[Math.min(4,Math.floor((level-1)/2))]+'.':'Keep training toward your next evolution.';
+ $('finishEvolution').dataset.notificationId=n.id;
+ setTimeout(()=>{$('evolutionModal').classList.add('revealed');$('finishEvolution').focus()},matchMedia('(prefers-reduced-motion: reduce)').matches?50:2850);
+}
+async function finishEvolution(){
+ const id=Number($('finishEvolution').dataset.notificationId);$('evolutionModal').classList.add('hidden');document.querySelectorAll('.app>section').forEach(e=>e.inert=false);evolutionBusy=false;currentEvolutionId=null;
+ await markNotificationRead(id);pumpEvolution();
+}
+async function loadNotifications(){
+ if(!app.user||!app.state)return;const uid=app.user.id;
+ const {data,error}=await app.sb.from('runner_notifications').select('*').order('created_at',{ascending:false}).limit(50);
+ if(error||app.user?.id!==uid)return;
+ notifications=data||[];drawNotifications();notifications.filter(n=>!n.read_at&&n.actor_id===uid&&n.kind==='level_up').slice().reverse().forEach(queueEvolution);
+ if(notificationUser===uid)return;
+ if(notificationChannel)await app.sb.removeChannel(notificationChannel);
+ notificationUser=uid;notificationChannel=app.sb.channel('runner-notifications-'+uid).on('postgres_changes',{event:'INSERT',schema:'public',table:'runner_notifications',filter:'recipient_id=eq.'+uid},payload=>{
+  const n=payload.new;if(notifications.some(x=>x.id===n.id))return;notifications.unshift(n);notifications=notifications.slice(0,50);drawNotifications();showToast(n);if(n.actor_id===uid&&n.kind==='level_up')queueEvolution(n);
+ }).subscribe();
+}
+$('notificationButton').onclick=()=>{drawNotifications();openModal('notificationsModal')};
+$('closeNotifications').onclick=closeModal;$('markNotificationsRead').onclick=markAllNotificationsRead;$('finishEvolution').onclick=finishEvolution;
 $('runnerSettings').onsubmit=async e=>{
  e.preventDefault();const form=e.currentTarget,btn=form.querySelector('button');if(btn.disabled||!form.reportValidity())return;
  btn.disabled=true;
@@ -139,9 +197,9 @@ $('confirmDeleteAccount').onclick=async()=>{
  }catch(err){notice('deleteAccountMessage',err.message);btn.disabled=false}
  finally{delete btn.dataset.busy;btn.textContent='Delete everything permanently';$('cancelDeleteAccount').disabled=false}
 };
-document.addEventListener('road42:updated',()=>{render();if(!lastHealth)healthStatus()});
-document.addEventListener('road42:signedout',()=>{clearTimeout(healthTimer);closeModal();lastHealth=0;$('healthDuplicates').innerHTML=''});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)healthStatus()});
+document.addEventListener('road42:updated',()=>{render();loadNotifications();if(!lastHealth)healthStatus()});
+document.addEventListener('road42:signedout',()=>{clearTimeout(healthTimer);clearTimeout(toastTimer);if(notificationChannel)app.sb.removeChannel(notificationChannel);notificationChannel=null;notificationUser=null;notifications=[];evolutionQueue=[];evolutionBusy=false;currentEvolutionId=null;$('evolutionModal').classList.add('hidden');closeModal();lastHealth=0;$('healthDuplicates').innerHTML=''});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){healthStatus();loadNotifications()}});
 const callback=new URLSearchParams(location.search).get('health');
 if(callback){
  const messages={connected:'Google Health connected. Your runs are being imported.',cancelled:'Connection cancelled. You can try again whenever you are ready.',expired:'The connection link expired. Please reconnect.',permission_required:'Allow activity access to sync your runs.',already_linked:'This Google Health account is already linked to another runner.',different_health_account:'Disconnect the current Google Health account before choosing another.'};
@@ -150,5 +208,5 @@ if(callback){
  document.addEventListener('road42:updated',()=>app.go('more'),{once:true});
 }
 const detail=document.createElement('p');detail.id='rewardDetails';detail.className='sub';detail.setAttribute('role','status');detail.textContent='Tap a reward to see how to earn it.';$('rewardGrid').after(detail);
-if(app.state){render();healthStatus()}
+if(app.state){render();loadNotifications();healthStatus()}
 })();

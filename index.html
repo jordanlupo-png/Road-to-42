@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="assets/brand/icon-192.png?v=39">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4">
 </script>
-<link rel="stylesheet" href="theme.css?v=43">
+<link rel="stylesheet" href="theme.css?v=44">
 </head>
 <body>
 <div class="app">
@@ -107,6 +107,7 @@
 <h2 id="who">
 </h2>
 </div>
+<button id="notificationButton" class="notificationButton" type="button" aria-label="Open notifications">🔔<span id="notificationCount" class="notificationCount hidden">0</span></button>
 <button class="pill" data-go="more">Profile</button>
 </header>
 <main>
@@ -401,12 +402,35 @@
 <button id="cancelDeleteAccount" class="secondaryButton" type="button">Cancel</button>
 </div>
 </div>
+<div id="notificationsModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="notificationsTitle">
+<div class="modalCard notificationModalCard">
+<div class="modalHeading"><div><small>COMMUNITY</small><h2 id="notificationsTitle">Notifications</h2></div><button id="closeNotifications" class="modalClose" type="button" aria-label="Close notifications">×</button></div>
+<div id="notificationList" class="notificationList"></div>
+<button id="markNotificationsRead" class="secondaryButton" type="button">Mark all as read</button>
+</div>
+</div>
+<div id="evolutionModal" class="evolutionOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="evolutionTitle">
+<div class="evolutionSky" aria-hidden="true"></div>
+<div class="evolutionContent">
+<small id="evolutionKicker">LEVEL UP</small>
+<h2 id="evolutionTitle">Your runner is evolving!</h2>
+<p id="evolutionLead">Something is happening…</p>
+<div class="evolutionStage">
+<img id="evolutionOldAvatar" class="evolutionAvatar evolutionOld" alt="">
+<div class="evolutionBurst" aria-hidden="true"></div>
+<img id="evolutionNewAvatar" class="evolutionAvatar evolutionNew" alt="">
+</div>
+<h3 id="evolutionResult"></h3>
+<p id="evolutionMessage"></p>
+<button id="finishEvolution" class="cta" type="button">Continue the adventure</button>
+</div>
+</div>
+<div id="notificationToast" class="notificationToast hidden" role="status" aria-live="polite"></div>
 </div>
 <script src="core.js?v=1" defer></script>
 <script src="game.js?v=41" defer>
 </script>
-<script src="features.js?v=5" defer>
+<script src="features.js?v=6" defer>
 </script>
 </body>
 </html>
-

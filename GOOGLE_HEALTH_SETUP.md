@@ -42,6 +42,8 @@ POST this configuration to the documented projects/{project-number}/subscribers 
 
 Notifications are authenticated with the shared secret, queued in Postgres, and processed by an Edge Function. Supabase Cron retries pending jobs once a minute, with a five-minute delay after failures. Runs can also be synced manually. No direct API polling happens while the queue is empty.
 
+For data-change notifications, the endpoint also verifies the `GOOGLE-HEALTH-API-SIGNATURE` against Google Health's rotating public keyset before accepting the batch. The authorized and unauthorized verification handshakes use the configured shared secret, as required by Google.
+
 ## Acceptance checks requiring real accounts
 
 - Connect each runner's own Google Health account through Runner → Google Health.

@@ -23,6 +23,7 @@ create table if not exists public.push_deliveries (
 
 alter table public.push_deliveries enable row level security;
 revoke all on public.push_deliveries from public, anon, authenticated;
+create index if not exists push_deliveries_subscription_idx on public.push_deliveries(subscription_id);
 
 do $$
 begin

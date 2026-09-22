@@ -87,7 +87,7 @@ async function syncPushState(){
  if(isiOS()&&!standalone()){drawPushState('On iPhone: Share → Add to Home Screen, then open the installed game.',false,'Install first',true);return}
  if(Notification.permission==='denied'){drawPushState('Notifications are blocked in your phone settings.',false,'Blocked',true);return}
  try{
-  pushRegistration=await navigator.serviceWorker.register('./sw.js?v=1',{scope:'./'});
+  pushRegistration=await navigator.serviceWorker.register('./sw.js?v=2',{scope:'./'});
   pushRegistration=await navigator.serviceWorker.ready;
   const subscription=await pushRegistration.pushManager.getSubscription();
   if(!subscription){drawPushState('Receive XP, badge and evolution alerts when the game is closed.');return}
@@ -102,7 +102,7 @@ async function enablePush(){
   const permission=await Notification.requestPermission();
   if(permission!=='granted'){drawPushState(permission==='denied'?'Notifications are blocked in your phone settings.':'Permission was not granted.',false,permission==='denied'?'Blocked':'Enable phone alerts',permission==='denied');return}
   const data=await pushInvoke({action:'public_key'}),key=Uint8Array.from(atob(data.public_key.replaceAll('-','+').replaceAll('_','/').padEnd(Math.ceil(data.public_key.length/4)*4,'=')),c=>c.charCodeAt(0));
-  pushRegistration=pushRegistration||await navigator.serviceWorker.register('./sw.js?v=1',{scope:'./'});pushRegistration=await navigator.serviceWorker.ready;
+  pushRegistration=pushRegistration||await navigator.serviceWorker.register('./sw.js?v=2',{scope:'./'});pushRegistration=await navigator.serviceWorker.ready;
   const subscription=await pushRegistration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:key});
   await pushInvoke({action:'subscribe',subscription:subscription.toJSON()});pushSyncedUser=app.user.id;
   drawPushState('Enabled. Alerts can now arrive when the game is closed.',true,'Disable alerts');

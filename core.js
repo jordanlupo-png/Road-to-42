@@ -6,6 +6,9 @@ const weekKey=(value)=>{const d=new Date((value||dateKey())+'T12:00:00');d.setDa
 const isRun=l=>['Easy','Quality','Long','run'].includes(l.type||l.activity_type)&&Number(l.km??l.distance_km)>0;
 const km=l=>Number(l.km??l.distance_km)||0;
 const day=l=>(l.date||l.activity_date).slice(0,10);
+const parseDistance=value=>{const raw=String(value??'').trim().replace(',','.');if(!/^\d{1,3}(?:\.\d{1,2})?$/.test(raw))return null;const n=Number(raw);return Number.isFinite(n)&&n>=0&&n<=500?n:null};
+const durationMinutes=(hours,minutes)=>{const h=Number(hours),m=Number(minutes);return Number.isInteger(h)&&Number.isInteger(m)&&h>=0&&h<=168&&m>=0&&m<=59?h*60+m:null};
+const paceSeconds=(minutes,seconds)=>{if(String(minutes??'').trim()===''&&String(seconds??'').trim()==='')return 0;const m=Number(minutes||0),s=Number(seconds||0);return Number.isInteger(m)&&Number.isInteger(s)&&m>=0&&m<=99&&s>=0&&s<=59?m*60+s:null};
 function stats(logs,now=new Date()) {
  const today=dateKey(now),start=weekKey(today),runs=logs.filter(l=>isRun(l)&&day(l)<=today);
  const xp=runs.reduce((n,l)=>n+km(l),0),weeks={};
@@ -47,7 +50,7 @@ function rewards(logs,target,now=new Date()){
  ['✨','Training story',all.length>=20,'Log twenty runs.']
  ];
 }
-const api={dateKey,weekKey,isRun,stats,rewards};
+const api={dateKey,weekKey,isRun,parseDistance,durationMinutes,paceSeconds,stats,rewards};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 else root.Road42Core=api;
 })(typeof window==='undefined'?this:window);

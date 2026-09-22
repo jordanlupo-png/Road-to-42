@@ -24,3 +24,16 @@ test('week boundaries follow local Monday, across year and daylight saving',()=>
 test('a long run does not unlock quality-session reward',()=>{
  assert.equal(C.rewards([{type:'Long',km:8,date:'2026-09-14'}],25,now).find(x=>x[1]==='Quality session')[2],false);
 });
+test('distance accepts at most two decimal places and supports comma keyboards',()=>{
+ assert.equal(C.parseDistance('7.12'),7.12);
+ assert.equal(C.parseDistance('7,12'),7.12);
+ assert.equal(C.parseDistance('7.123'),null);
+ assert.equal(C.parseDistance('500.01'),null);
+});
+test('duration and pace use separate numeric fields',()=>{
+ assert.equal(C.durationMinutes('1','25'),85);
+ assert.equal(C.durationMinutes('1','60'),null);
+ assert.equal(C.paceSeconds('6','30'),390);
+ assert.equal(C.paceSeconds('6','60'),null);
+ assert.equal(C.paceSeconds('',''),0);
+});

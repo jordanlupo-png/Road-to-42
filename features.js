@@ -4,6 +4,7 @@ const app=window.Road42,C=window.Road42Core,$=id=>document.getElementById(id);
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let awarding=false,healthBusy=false,healthTimer=null,activeModal=null,returnFocus=null,lastHealth=0;
 let notifications=[],notificationChannel=null,notificationUser=null,toastTimer=null,evolutionBusy=false,currentEvolutionId=null,evolutionQueue=[],goalReviewTimer=null,pendingGoalReview=null;
+let pushRegistration=null,pushSyncedUser=null,pushBusy=false;
 const notice=(id,text)=>{$(id).textContent=text;$(id).classList.remove('hidden')};
 function openModal(id){returnFocus=document.activeElement;activeModal=$(id);activeModal.classList.remove('hidden');document.querySelectorAll('.app>section').forEach(e=>e.inert=true);activeModal.querySelector('input,button')?.focus()}
 function closeModal(){if(activeModal)activeModal.classList.add('hidden');activeModal=null;document.querySelectorAll('.app>section').forEach(e=>e.inert=false);returnFocus?.focus();pumpEvolution();if(!evolutionBusy)showGoalReview()}
@@ -68,6 +69,55 @@ const notificationIcon=kind=>kind==='xp'?'⚡':kind==='badge'?'🏅':'✨';
 const evolutionNames=['The Beginning','Building Habits','Getting Stronger','Peak Form','Champion'];
 const avatarStage=level=>['01','05','10','15','20'][Math.min(4,Math.floor((Math.max(1,level)-1)/2))];
 const avatarPath=(character,level)=>'assets/avatars/'+character+'/'+character+'_'+avatarStage(level)+'.webp';
+const pushSupported=()=>location.protocol==='https:'&&!!location.hostname&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
+const isiOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const standalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const pushInvoke=async body=>{
+ const result=await app.sb.functions.invoke('push-notifications',{body});
+ if(result.error||result.data?.error)throw new Error(result.data?.error||'Phone alerts could not be updated.');
+ return result.data;
+};
+function drawPushState(message,enabled=false,button='Enable phone alerts',disabled=false){
+ const box=$('pushStatus').closest('.pushControls');$('pushStatus').textContent=message;box.classList.toggle('enabled',enabled);
+ $('pushToggle').textContent=button;$('pushToggle').dataset.enabled=enabled?'true':'false';$('pushToggle').disabled=disabled;
+}
+async function syncPushState(){
+ if(!app.user||pushBusy)return;
+ if(!pushSupported()){drawPushState('Phone alerts are not supported in this browser.',false,'Unavailable',true);return}
+ if(isiOS()&&!standalone()){drawPushState('On iPhone: Share → Add to Home Screen, then open the installed game.',false,'Install first',true);return}
+ if(Notification.permission==='denied'){drawPushState('Notifications are blocked in your phone settings.',false,'Blocked',true);return}
+ try{
+  pushRegistration=await navigator.serviceWorker.register('./sw.js?v=1',{scope:'./'});
+  pushRegistration=await navigator.serviceWorker.ready;
+  const subscription=await pushRegistration.pushManager.getSubscription();
+  if(!subscription){drawPushState('Receive XP, badge and evolution alerts when the game is closed.');return}
+  if(pushSyncedUser!==app.user.id){await pushInvoke({action:'subscribe',subscription:subscription.toJSON()});pushSyncedUser=app.user.id}
+  drawPushState('Enabled on this device.',true,'Disable alerts');
+ }catch{drawPushState('Phone alerts could not be checked. Try again.',false,'Try again')}
+}
+async function enablePush(){
+ if(isiOS()&&!standalone()){drawPushState('On iPhone: Share → Add to Home Screen, then open the installed game.',false,'Install first',true);return}
+ pushBusy=true;$('pushToggle').disabled=true;
+ try{
+  const permission=await Notification.requestPermission();
+  if(permission!=='granted'){drawPushState(permission==='denied'?'Notifications are blocked in your phone settings.':'Permission was not granted.',false,permission==='denied'?'Blocked':'Enable phone alerts',permission==='denied');return}
+  const data=await pushInvoke({action:'public_key'}),key=Uint8Array.from(atob(data.public_key.replaceAll('-','+').replaceAll('_','/').padEnd(Math.ceil(data.public_key.length/4)*4,'=')),c=>c.charCodeAt(0));
+  pushRegistration=pushRegistration||await navigator.serviceWorker.register('./sw.js?v=1',{scope:'./'});pushRegistration=await navigator.serviceWorker.ready;
+  const subscription=await pushRegistration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:key});
+  await pushInvoke({action:'subscribe',subscription:subscription.toJSON()});pushSyncedUser=app.user.id;
+  drawPushState('Enabled. Alerts can now arrive when the game is closed.',true,'Disable alerts');
+ }catch{drawPushState('Phone alerts could not be enabled. Please try again.',false,'Try again')}
+ finally{pushBusy=false;if($('pushToggle').textContent!=='Blocked'&&$('pushToggle').textContent!=='Install first')$('pushToggle').disabled=false}
+}
+async function disablePush(){
+ pushBusy=true;$('pushToggle').disabled=true;
+ try{
+  pushRegistration=pushRegistration||await navigator.serviceWorker.ready;const subscription=await pushRegistration.pushManager.getSubscription();
+  if(subscription){await pushInvoke({action:'unsubscribe',endpoint:subscription.endpoint});await subscription.unsubscribe()}
+  pushSyncedUser=null;drawPushState('Phone alerts are off on this device.',false,'Enable phone alerts');
+ }catch{drawPushState('Could not disable alerts. Please try again.',true,'Disable alerts')}
+ finally{pushBusy=false;$('pushToggle').disabled=false}
+}
 function drawNotifications(){
  const unread=notifications.filter(n=>!n.read_at).length;
  $('notificationCount').textContent=unread>99?'99+':unread;$('notificationCount').classList.toggle('hidden',!unread);
@@ -119,8 +169,9 @@ async function loadNotifications(){
   const n=payload.new;if(notifications.some(x=>x.id===n.id))return;notifications.unshift(n);notifications=notifications.slice(0,50);drawNotifications();showToast(n);if(n.actor_id===uid&&n.kind==='level_up')queueEvolution(n);
  }).subscribe();
 }
-$('notificationButton').onclick=()=>{drawNotifications();openModal('notificationsModal')};
+$('notificationButton').onclick=()=>{drawNotifications();syncPushState();openModal('notificationsModal')};
 $('closeNotifications').onclick=closeModal;$('markNotificationsRead').onclick=markAllNotificationsRead;$('finishEvolution').onclick=finishEvolution;
+$('pushToggle').onclick=()=>$('pushToggle').dataset.enabled==='true'?disablePush():enablePush();
 $('runnerSettings').onsubmit=async e=>{
  e.preventDefault();const form=e.currentTarget,btn=form.querySelector('button');if(btn.disabled||!form.reportValidity())return;
  btn.disabled=true;
@@ -201,8 +252,8 @@ $('confirmDeleteAccount').onclick=async()=>{
  }catch(err){notice('deleteAccountMessage',err.message);btn.disabled=false}
  finally{delete btn.dataset.busy;btn.textContent='Delete everything permanently';$('cancelDeleteAccount').disabled=false}
 };
-document.addEventListener('road42:updated',()=>{render();loadNotifications();if(!lastHealth)healthStatus()});
-document.addEventListener('road42:signedout',()=>{clearTimeout(healthTimer);clearTimeout(toastTimer);clearTimeout(goalReviewTimer);pendingGoalReview=null;if(notificationChannel)app.sb.removeChannel(notificationChannel);notificationChannel=null;notificationUser=null;notifications=[];evolutionQueue=[];evolutionBusy=false;currentEvolutionId=null;$('evolutionModal').classList.add('hidden');closeModal();lastHealth=0;$('healthDuplicates').innerHTML=''});
+document.addEventListener('road42:updated',()=>{render();loadNotifications();syncPushState();if(!lastHealth)healthStatus()});
+document.addEventListener('road42:signedout',()=>{clearTimeout(healthTimer);clearTimeout(toastTimer);clearTimeout(goalReviewTimer);pendingGoalReview=null;if(notificationChannel)app.sb.removeChannel(notificationChannel);notificationChannel=null;notificationUser=null;notifications=[];evolutionQueue=[];evolutionBusy=false;currentEvolutionId=null;pushSyncedUser=null;$('evolutionModal').classList.add('hidden');closeModal();lastHealth=0;$('healthDuplicates').innerHTML=''});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){healthStatus();loadNotifications()}});
 const callback=new URLSearchParams(location.search).get('health');
 if(callback){
@@ -212,5 +263,5 @@ if(callback){
  document.addEventListener('road42:updated',()=>app.go('more'),{once:true});
 }
 const detail=document.createElement('p');detail.id='rewardDetails';detail.className='sub';detail.setAttribute('role','status');detail.textContent='Tap a reward to see how to earn it.';$('rewardGrid').after(detail);
-if(app.state){render();loadNotifications();healthStatus()}
+if(app.state){render();loadNotifications();syncPushState();healthStatus()}
 })();

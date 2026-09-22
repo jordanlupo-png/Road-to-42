@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="assets/brand/icon-192.png?v=39">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4">
 </script>
-<link rel="stylesheet" href="theme.css?v=44">
+<link rel="stylesheet" href="theme.css?v=45">
 </head>
 <body>
 <div class="app">
@@ -405,6 +405,10 @@
 <div id="notificationsModal" class="modalOverlay hidden" role="dialog" aria-modal="true" aria-labelledby="notificationsTitle">
 <div class="modalCard notificationModalCard">
 <div class="modalHeading"><div><small>COMMUNITY</small><h2 id="notificationsTitle">Notifications</h2></div><button id="closeNotifications" class="modalClose" type="button" aria-label="Close notifications">×</button></div>
+<div class="pushControls">
+<div><strong>Phone alerts</strong><p id="pushStatus" class="sub" role="status">Checking this device…</p></div>
+<button id="pushToggle" class="secondaryButton" type="button">Enable phone alerts</button>
+</div>
 <div id="notificationList" class="notificationList"></div>
 <button id="markNotificationsRead" class="secondaryButton" type="button">Mark all as read</button>
 </div>
@@ -430,7 +434,7 @@
 <script src="core.js?v=1" defer></script>
 <script src="game.js?v=41" defer>
 </script>
-<script src="features.js?v=7" defer>
+<script src="features.js?v=8" defer>
 </script>
 </body>
 </html>

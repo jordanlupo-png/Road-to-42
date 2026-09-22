@@ -83,8 +83,8 @@ function drawPushState(message,enabled=false,button='Enable phone alerts',disabl
 }
 async function syncPushState(){
  if(!app.user||pushBusy)return;
- if(!pushSupported()){drawPushState('Phone alerts are not supported in this browser.',false,'Unavailable',true);return}
  if(isiOS()&&!standalone()){drawPushState('On iPhone: Share → Add to Home Screen, then open the installed game.',false,'Install first',true);return}
+ if(!pushSupported()){drawPushState('Phone alerts are not supported in this browser.',false,'Unavailable',true);return}
  if(Notification.permission==='denied'){drawPushState('Notifications are blocked in your phone settings.',false,'Blocked',true);return}
  try{
   pushRegistration=await navigator.serviceWorker.register('./sw.js?v=2',{scope:'./'});

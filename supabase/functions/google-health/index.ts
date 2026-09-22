@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2.57.4";
 import { IMPORT_START, normalizeRun } from "./normalize.mjs";
+import { verifyGoogleHealthSignature } from "./webhook-signature.mjs";
 
 const APP = "https://jordanlupo-png.github.io/Road-to-42/";
 const ORIGIN = new URL(APP).origin;
@@ -136,6 +137,7 @@ async function webhook(req:Request) {
  if(raw.length>262144) return json({error:"too_large"},413);
  let payload:any; try {payload=JSON.parse(raw);} catch {return json({error:"invalid_request"},400);}
  if(payload.type==="verification") return json({verified:true});
+ if(!await verifyGoogleHealthSignature(raw,req.headers.get("GOOGLE-HEALTH-API-SIGNATURE")||"")) return json({error:"invalid_signature"},401);
  const batch=Array.isArray(payload)?payload:[payload];
  if(batch.length>100) return json({error:"too_large"},413);
  const ids=new Set<string>();
